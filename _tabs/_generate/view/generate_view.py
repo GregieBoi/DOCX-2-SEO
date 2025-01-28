@@ -41,8 +41,9 @@ class GenerateView(QWidget):
 
     # create the button override, link override, and button widgets for manual
     self.manualButtonOverride = LabeledLineEdit('Button Override', "View Inventory")
-    self.manualLinkOverride = LabeledLineEdit('Link Override')
+    self.manualLinkOverride = LabeledLineEdit('Link Override', "https://www.client.com")
     self.manualGenerateButton = QPushButton('Generate')
+    self.manualGenerateButton.setEnabled(False)
 
     # add the widgets to the manual tab layout
     self.manualTabLayout.addWidget(self.manualButtonOverride)
@@ -63,8 +64,9 @@ class GenerateView(QWidget):
     # create the topic dropdown, button override, link override, and button widgets for automatic
     self.automaticTopicCombo = LabeledDropdown('Topic')
     self.automaticButtonOverride = LabeledLineEdit('Button Override', "View Inventory")
-    self.automaticLinkOverride = LabeledLineEdit('Link Override')
+    self.automaticLinkOverride = LabeledLineEdit('Link Override', "https://www.client.com")
     self.automaticGenerateButton = QPushButton('Generate')
+    self.automaticGenerateButton.setEnabled(False)
 
     # add the widgets to the automatic tab layout
     self.automaticTabLayout.addWidget(self.automaticTopicCombo)

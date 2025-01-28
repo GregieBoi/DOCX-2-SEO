@@ -12,6 +12,8 @@ class LabeledButton(QWidget):
 
     self.button.clicked.connect(self.buttonClicked)
 
+    self.button.setAttribute(Qt.WidgetAttribute.WA_MacShowFocusRect, False)
+
     layout = QVBoxLayout()
     layout.addWidget(self.label)
     layout.addWidget(self.button)

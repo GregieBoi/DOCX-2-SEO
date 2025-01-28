@@ -2,12 +2,16 @@ from PyQt6.QtWidgets import QWidget, QLabel, QTextEdit, QVBoxLayout
 from PyQt6.QtCore import Qt
 
 class LabeledTextEdit(QWidget):
-  def __init__(self, labelText, placeholderText=None, parent=None):
+  def __init__(self, labelText: str, placeholderText: str=None, lines: int=None, parent=None):
     super().__init__(parent)
     self.label = QLabel(labelText)
     self.textEdit = QTextEdit()
     if placeholderText:
       self.textEdit.setPlaceholderText(placeholderText)
+    if lines:
+      metrics = self.textEdit.fontMetrics()
+      line_height = metrics.lineSpacing()
+      self.textEdit.setFixedHeight(lines * line_height + 10)
     layout = QVBoxLayout()
     layout.addWidget(self.label)
     layout.addWidget(self.textEdit)

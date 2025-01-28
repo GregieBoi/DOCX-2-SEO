@@ -1,15 +1,18 @@
-from PyQt6.QtWidgets import QWidget,QLabel, QLineEdit, QVBoxLayout
+from PyQt6.QtWidgets import QWidget,QLabel, QLineEdit, QVBoxLayout, QSpacerItem
 from PyQt6.QtCore import Qt
 
 class LabeledLineEdit(QWidget):
-  def __init__(self, labelText, placeholderText=None, parent=None):
+  def __init__(self, labelText: str, placeholderText: str=None, parent=None):
     super().__init__(parent)
     self.label = QLabel(labelText)
+    self.spacer = QSpacerItem(5, 7)
     self.lineEdit = QLineEdit()
+    self.lineEdit.setAttribute(Qt.WidgetAttribute.WA_MacShowFocusRect, False)
     if placeholderText:
-      self.lineEdit.setText(placeholderText)
+      self.lineEdit.setPlaceholderText(placeholderText)
     layout = QVBoxLayout()
     layout.addWidget(self.label)
+    layout.addItem(self.spacer)
     layout.addWidget(self.lineEdit)
     layout.setAlignment(Qt.AlignmentFlag.AlignTop)
     self.setLayout(layout)
