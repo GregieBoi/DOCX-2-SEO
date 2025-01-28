@@ -44,7 +44,8 @@ class ClientView(QWidget):
     self.saveButton.setEnabled(False)
     self.deleteButton = QPushButton('Delete')
     self.deleteButton.setEnabled(False)
-    self.deleteButton.setStyleSheet("""
+    self.deleteButton.setObjectName('deleteButton')
+    '''self.deleteButton.setStyleSheet("""
                                     QPushButton {
                                       background-color: red; 
                                       color: white; 
@@ -63,7 +64,8 @@ class ClientView(QWidget):
                                       background-color: darkRed; 
                                       color: grey; 
                                     }
-                                    """)
+                                    """)'''
+    
 
     # add the buttons to the button layout
     self.buttonLayout.addWidget(self.saveButton)

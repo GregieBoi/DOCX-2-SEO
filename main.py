@@ -6,6 +6,9 @@ from viewmodel.main_viewmodel import MainViewModel
 
 if __name__ == '__main__':
   app = QApplication(sys.argv)
+  qss = "styles.qss"
+  with open(qss) as f:
+    app.setStyleSheet(f.read())
   model = MainModel()
   viewModel = MainViewModel(model)
   view = MainView(viewModel)
