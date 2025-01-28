@@ -8,7 +8,7 @@ from _tabs._topics.view.topics_view import TopicsView
 class MainView(QWidget):
   def __init__(self, viewModel):
     super().__init__()
-    # self.setFixedSize(600, 600) # mess with size later
+    self.setFixedSize(750, 750) # mess with size later
     self._viewModel = viewModel
     self._viewModel.countChanged.connect(self.updateLabel)  # Connect signal to the slot
     self.initUI()
