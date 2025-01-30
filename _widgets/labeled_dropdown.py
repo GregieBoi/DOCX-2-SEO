@@ -45,5 +45,8 @@ class LabeledDropdown(QWidget):
   def removeItem(self, item: str):
     self.dropdown.removeItem(item)
 
+  def setCurrentText(self, text: str):
+    self.dropdown.setCurrentText(text)
+
   def sendCurrentText(self):
     self.currentTextChanged.emit(self.dropdown.currentText())

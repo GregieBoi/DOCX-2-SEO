@@ -14,7 +14,7 @@ import json
 class ClientModel:
   def __init__(self):
     self.clientDirectory: str = self.findMWD()
-    self.clientList: list[str] = self.fetchClientList()
+    self.clientList: list[str] = self.fetchClientList("__init__")
     self.clientName: str = ""
     self.currentClient: str = ""
     self.clientButton: str = ""
@@ -59,12 +59,14 @@ class ClientModel:
   
   # reset the client attributes
   def clear(self):
-    self.clientList = self.fetchClientList()
     self.clientName = ""
     self.currentClient = self.clientList[0]
     self.clientButton = ""
     self.clientStyle = ""
     self.clientWrapper = ""
+
+  def refreshClientList(self):
+    self.clientList = self.fetchClientList("refreshClientList")
 
   # find the main window directory
   def findMWD(self):
@@ -92,13 +94,21 @@ class ClientModel:
       f.write(self.clientWrapper)
       f.close()
 
-    # load the client attributes
-    self.loadClient(self.clientName)
+    # refresh the client list
+    self.refreshClientList()
+
+    # update the current client
+    self.setCurrentClient(self.clientName)
 
   # load the client attributes from a directory
-  def loadClient(self, clientName):
+  def loadClient(self, clientName: str):
     # clear the client attributes
     self.clear()
+
+    if clientName in ["New Client", "", None]:
+      self.currentClient = "New Client"
+      self.clientName = ""
+      return
 
     # set the currentClient to the clientName
     self.currentClient = clientName
@@ -156,24 +166,28 @@ class ClientModel:
       f.close()
 
     # clear the client attributes
-    self.clear()
+    self.refreshClientList()
 
-    # load the new client attributes
-    self.loadClient(newClientName)
+    # change the current client name to the new client
+    self.setCurrentClient(newClientName)
 
   # delete a client from the directory
   def deleteClient(self):
     # delete the client directory
+    #if self.currentClient not in ["New Client", ""]:
     shutil.rmtree(os.path.join(self.clientDirectory, self.currentClient))
 
-    # update the clientList
+      # update the clientList and all data points
     self.clear()
+    return
 
   # fetch the list of clients from the directory
-  def fetchClientList(self):
+  def fetchClientList(self, caller: str):
     # read the client directories from the directory and append them to list
     clients = []
+    print("hello I was called by: " + caller)
     for entry in os.scandir(self.clientDirectory):
+      print("hello")
       if entry.is_dir():
         clients.append(entry.name)
     

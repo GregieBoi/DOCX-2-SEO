@@ -1,11 +1,14 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QTextEdit, QVBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 
 class LabeledTextEdit(QWidget):
+  textChanged = pyqtSignal()
+
   def __init__(self, labelText: str, placeholderText: str=None, lines: int=None, parent=None):
     super().__init__(parent)
     self.label = QLabel(labelText)
     self.textEdit = QTextEdit()
+    self.textEdit.textChanged.connect(self.sendText)
     if placeholderText:
       self.textEdit.setPlaceholderText(placeholderText)
     if lines:
@@ -18,6 +21,9 @@ class LabeledTextEdit(QWidget):
     layout.setAlignment(Qt.AlignmentFlag.AlignTop)
     self.setLayout(layout)
 
+  def sendText(self):
+    self.textChanged.emit()
+
   def getLabel(self):
     return self.label
 
@@ -28,7 +34,7 @@ class LabeledTextEdit(QWidget):
     return self.textEdit.toPlainText()
 
   def setText(self, text: str):
-    self.textEdit.setText(text)
+    self.textEdit.setPlainText(text)
   
   def clear(self):
     self.textEdit.clear()
