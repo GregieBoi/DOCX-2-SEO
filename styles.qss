@@ -1,4 +1,4 @@
-QPushButton#deleteButton {
+QPushButton#destructiveButton {
   background-color: red; 
   color: white; 
   border-radius: 5px; 
@@ -8,11 +8,11 @@ QPushButton#deleteButton {
   padding-right: 12px; 
   margin-bottom: 1px;
 } 
-QPushButton#deleteButton:pressed {
+QPushButton#destructiveButton:pressed {
   background-color: darkRed; 
   color: grey;
 }
-QPushButton#deleteButton:disabled {
+QPushButton#destructiveButton:disabled {
   background-color: darkred; 
   color: grey; 
 }

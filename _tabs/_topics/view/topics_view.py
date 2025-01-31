@@ -62,7 +62,7 @@ class TopicsView(QWidget):
     self.saveButton.setEnabled(False)
     self.deleteButton = QPushButton('Delete')
     self.deleteButton.setEnabled(False)
-    self.deleteButton.setObjectName('deleteButton')
+    self.deleteButton.setObjectName('destructiveButton')
 
     # add the buttons to the button layout
     self.buttonLayout.addWidget(self.saveButton)

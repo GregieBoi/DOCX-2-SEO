@@ -76,7 +76,6 @@ class ClientModel:
 
   # save the client attributes to a new directory
   def saveClient(self):
-    print('saving client')
     # create a new directory with the name of the client
     newClientDir = os.path.join(self.clientDirectory, self.clientName)
     os.mkdir(newClientDir)
@@ -128,7 +127,6 @@ class ClientModel:
 
   # update the client attributes
   def updateClient(self):
-    print("updating client")
     # check if currentClient is same as clientName
     if self.currentClient == self.clientName:
       with open(os.path.join(self.clientDirectory, self.currentClient, 'button.html'), 'w') as f:
@@ -185,16 +183,14 @@ class ClientModel:
     # update the clientList and all data points
     self.clear()
     self.refreshClientList()
-    print(self.getClientList())
+    (self.getClientList())
     return
 
   # fetch the list of clients from the directory
   def fetchClientList(self, caller: str):
     # read the client directories from the directory and append them to list
     clients = []
-    print("hello I was called by: " + caller)
     for entry in os.scandir(self.clientDirectory):
-      print("hello")
       if entry.is_dir():
         clients.append(entry.name)
     

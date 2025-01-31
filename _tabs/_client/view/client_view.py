@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QDialog, QVBoxLayout, QPushButton, QHBoxLayout
 from PyQt6.QtCore import Qt
 from _tabs._client.viewmodel.client_viewmodel import ClientViewModel
 from _widgets.labeled_dropdown import LabeledDropdown
 from _widgets.labeled_line_edit import LabeledLineEdit
 from _widgets.labeled_textedit import LabeledTextEdit
+from _modals.destructive_modal import DestructiveModal
 from bs4 import BeautifulSoup
 import json
 
@@ -58,11 +59,11 @@ class ClientView(QWidget):
     # create the buttons for the button layout
     self.saveButton = QPushButton('Save')
     self.saveButton.setEnabled(False)
-    self.saveButton.clicked.connect(lambda: self.saveClient(self.clientName.getText(), self.clientButton.getText(), self.clientStyle.getText(), self.clientWrapper.getText()))
+    self.saveButton.clicked.connect(lambda: self.saveClick(self.clientName.getText(), self.clientButton.getText(), self.clientStyle.getText(), self.clientWrapper.getText()))
     self.deleteButton = QPushButton('Delete')
     self.deleteButton.setEnabled(False)
-    self.deleteButton.setObjectName('deleteButton')
-    self.deleteButton.clicked.connect(self._viewModel.deleteClient)
+    self.deleteButton.setObjectName('destructiveButton')
+    self.deleteButton.clicked.connect(self.deleteClick)
 
     # add the buttons to the button layout
     self.buttonLayout.addWidget(self.saveButton)
@@ -141,14 +142,23 @@ class ClientView(QWidget):
     self.deleteButton.setEnabled(True)
     self.deleteButton.setToolTip("")
 
-  # save or update the client attributes
-  def saveClient(self, clientName, clientButton, clientStyle, clientWrapper):
-    print('The client combo current text is: ' + self.clientCombo.getCurrentText())
+  # handle update confirmation if conflict and send data to viewmodel for saving or updating
+  def saveClick(self, clientName, clientButton, clientStyle, clientWrapper):
     if self.clientCombo.getCurrentText() == "New Client":
       self._viewModel.saveClient(clientName, clientButton, clientStyle, clientWrapper)
       return
     
     self._viewModel.updateClient(clientName, clientButton, clientStyle, clientWrapper)
+
+  # handle delete confirmation and send data to viewmodel for deleting
+  def deleteClick(self):
+    warning = "Are you sure you want to delete " + self.clientCombo.getCurrentText() + " from the client list? This action cannot be undone."
+    destructiveButtonText = "Delete"
+    dialog = DestructiveModal(warning, destructiveButtonText)
+    dialog.exec()
+
+    if dialog.result() == QDialog.DialogCode.Accepted:
+      self._viewModel.deleteClient()
 
   # update on save
   def updateOnSave(self, clientName, clientList):
