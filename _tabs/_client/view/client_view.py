@@ -58,7 +58,7 @@ class ClientView(QWidget):
     # create the buttons for the button layout
     self.saveButton = QPushButton('Save')
     self.saveButton.setEnabled(False)
-    self.saveButton.clicked.connect(lambda: self._viewModel.saveClient(self.clientName.getText(), self.clientButton.getText(), self.clientStyle.getText(), self.clientWrapper.getText()))
+    self.saveButton.clicked.connect(lambda: self.saveClient(self.clientName.getText(), self.clientButton.getText(), self.clientStyle.getText(), self.clientWrapper.getText()))
     self.deleteButton = QPushButton('Delete')
     self.deleteButton.setEnabled(False)
     self.deleteButton.setObjectName('deleteButton')
@@ -143,6 +143,7 @@ class ClientView(QWidget):
 
   # save or update the client attributes
   def saveClient(self, clientName, clientButton, clientStyle, clientWrapper):
+    print('The client combo current text is: ' + self.clientCombo.getCurrentText())
     if self.clientCombo.getCurrentText() == "New Client":
       self._viewModel.saveClient(clientName, clientButton, clientStyle, clientWrapper)
       return
@@ -172,4 +173,7 @@ class ClientView(QWidget):
 
   # update on update
   def updateOnUpdate(self, clientName, clientList):
-    pass
+    self.clientCombo.clear()
+    self.clientCombo.addItems(clientList)
+    self.clientCombo.setCurrentText(clientName)
+    self.clientName.setText(clientName)

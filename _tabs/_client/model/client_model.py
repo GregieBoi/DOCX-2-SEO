@@ -76,6 +76,7 @@ class ClientModel:
 
   # save the client attributes to a new directory
   def saveClient(self):
+    print('saving client')
     # create a new directory with the name of the client
     newClientDir = os.path.join(self.clientDirectory, self.clientName)
     os.mkdir(newClientDir)
@@ -127,6 +128,7 @@ class ClientModel:
 
   # update the client attributes
   def updateClient(self):
+    print("updating client")
     # check if currentClient is same as clientName
     if self.currentClient == self.clientName:
       with open(os.path.join(self.clientDirectory, self.currentClient, 'button.html'), 'w') as f:
@@ -146,14 +148,15 @@ class ClientModel:
     newClientDir = os.path.join(self.clientDirectory, self.clientName)
     newClientName = self.clientName
 
-    # remove the old client directory and create a new one
-    shutil.rmtree(oldClientDir)
+    # create the updated client directory
     os.mkdir(newClientDir)
 
     # save the client attributes as files to the new directory
-    with open(os.path.join(newClientDir, 'topics.json'), 'w') as f:
-      f.write('{}')
-      f.close()
+    with open(os.path.join(oldClientDir, 'topics.json'), 'r') as r:
+      with open(os.path.join(newClientDir, 'topics.json'), 'w') as w:
+        w.write(r.read())
+        w.close()
+        r.close()
     with open(os.path.join(newClientDir, 'button.html'), 'w') as f:
       f.write(self.clientButton)
       f.close()
@@ -165,6 +168,9 @@ class ClientModel:
       f.write(self.clientWrapper)
       f.close()
 
+    # remove the old client directory
+    shutil.rmtree(oldClientDir)
+
     # clear the client attributes
     self.refreshClientList()
 
@@ -174,11 +180,12 @@ class ClientModel:
   # delete a client from the directory
   def deleteClient(self):
     # delete the client directory
-    #if self.currentClient not in ["New Client", ""]:
     shutil.rmtree(os.path.join(self.clientDirectory, self.currentClient))
 
-      # update the clientList and all data points
+    # update the clientList and all data points
     self.clear()
+    self.refreshClientList()
+    print(self.getClientList())
     return
 
   # fetch the list of clients from the directory
