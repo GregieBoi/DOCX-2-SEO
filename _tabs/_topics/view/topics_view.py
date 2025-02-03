@@ -19,8 +19,8 @@ class TopicsView(QWidget):
     # create the client dropdown, topic dropdown, topic name line edit, and link to line edit
     self.clientCombo = LabeledDropdown('Client')
     self.topicCombo = LabeledDropdown('Topic')
-    self.topicNameLineEdit = LabeledLineEdit('Topic Name')
-    self.topicLinkLineEdit = LabeledLineEdit('Topic Redirect Link')
+    self.topicNameLineEdit = LabeledLineEdit('Topic Name', 'New Topic')
+    self.topicLinkLineEdit = LabeledLineEdit('Topic Redirect Link', 'https://www.example.com/topic')
 
     # add the widgets to the topic selection layout
     self.topicSelectionLayout.addWidget(self.clientCombo)

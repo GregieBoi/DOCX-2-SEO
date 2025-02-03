@@ -15,8 +15,8 @@ import json
 
 class ClientModel(QObject):
   def __init__(self, mainModel: MainModel):
-    self._mainModel = mainModel
-    self.clientDirectory: str = self.findMWD()
+    self._mainModel: MainModel = mainModel
+    self.clientDirectory: str = self._mainModel.findClientDirectory()
     self.clientList: list[str] = ['New Client'] + self._mainModel.getClientList()
     self.clientName: str = ""
     self.currentClient: str = ""
@@ -188,7 +188,6 @@ class ClientModel(QObject):
     # update the clientList and all data points
     self.clear()
     self.refreshClientList()
-    (self.getClientList())
     return
 
   # fetch the list of clients from the directory
