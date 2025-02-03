@@ -60,3 +60,6 @@ class ClientViewModel(QObject):
 
   def startClients(self):
     self.initClients.emit(self._model.getClientList())
+
+  def getClientList(self):
+    return self._model.getClientList()

@@ -145,8 +145,46 @@ class ClientView(QWidget):
   # handle update confirmation if conflict and send data to viewmodel for saving or updating
   def saveClick(self, clientName, clientButton, clientStyle, clientWrapper):
     if self.clientCombo.getCurrentText() == "New Client":
+      print(self._viewModel.getClientList())
+      print(self.clientName.getText())
+      if self.clientName.getText().lower() in [x.lower() for x in self._viewModel.getClientList()]:
+        print("already exists")
+        warning = "A client with the name " + self.clientName.getText() + " already exists. Would you like to replace the existing client? This action cannot be undone!"
+        destructiveButtonText = "Replace"
+        dialog = DestructiveModal(warning, destructiveButtonText)
+        dialog.exec()
+
+        if dialog.result() == QDialog.DialogCode.Accepted:
+          clients = self._viewModel.getClientList()
+          for i, client in enumerate(clients):
+            if client.lower() == self.clientName.getText().lower():
+              clientName = clients[i]
+          self._viewModel.saveClient(clientName, clientButton, clientStyle, clientWrapper)
+          return
+        else:
+          return
       self._viewModel.saveClient(clientName, clientButton, clientStyle, clientWrapper)
       return
+    
+    print(self.clientName.getText().lower())
+    print(self.clientCombo.getCurrentText().lower())
+    print(self.clientName.getText().lower() != self.clientCombo.getCurrentText().lower())
+
+    if (self.clientName.getText().lower() != self.clientCombo.getCurrentText().lower()) and (self.clientName.getText().lower() in [x.lower() for x in self._viewModel.getClientList()]):
+      warning = "A client with the name " + self.clientName.getText() + " already exists. Would you like to replace the existing client? This action cannot be undone!"
+      destructiveButtonText = "Replace"
+      dialog = DestructiveModal(warning, destructiveButtonText)
+      dialog.exec()
+
+      if dialog.result() == QDialog.DialogCode.Accepted:
+        clients = self._viewModel.getClientList()
+        for i, client in enumerate(clients):
+          if client.lower() == self.clientName.getText().lower():
+            clientName = clients[i]
+        self._viewModel.updateClient(clientName, clientButton, clientStyle, clientWrapper)
+        return
+      else:
+        return
     
     self._viewModel.updateClient(clientName, clientButton, clientStyle, clientWrapper)
 

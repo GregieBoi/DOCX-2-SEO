@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QTabWidget, QVBoxLayout, QLabel, QPushButton
 from _widgets.labeled_dropdown import LabeledDropdown
+from model.main_model import MainModel
 from _tabs._client.model.client_model import ClientModel
 from _tabs._client.viewmodel.client_viewmodel import ClientViewModel
 from _tabs._client.view.client_view import ClientView
@@ -20,7 +21,8 @@ class MainView(QWidget):
     self.layout = QVBoxLayout()
     self.tabs = QTabWidget()
     self.layout.addWidget(self.tabs)
-    self.clientModel = ClientModel()
+    self.mainModel = MainModel()
+    self.clientModel = ClientModel(self.mainModel)
     self.clientModelView = ClientViewModel(self.clientModel)
     self.clientTab = ClientView(self.clientModelView)
     self.tabs.addTab(self.clientTab, 'Client')

@@ -1,3 +1,5 @@
+from PyQt6.QtCore import QObject
+from model.main_model import MainModel
 import sys
 import os
 import shutil
@@ -11,10 +13,11 @@ import json
 # 4. Provide a way to fetch all possible clients from a directory
 # 5. Delete a client from the directory
 
-class ClientModel:
-  def __init__(self):
+class ClientModel(QObject):
+  def __init__(self, mainModel: MainModel):
+    self._mainModel = mainModel
     self.clientDirectory: str = self.findMWD()
-    self.clientList: list[str] = self.fetchClientList("__init__")
+    self.clientList: list[str] = ['New Client'] + self._mainModel.getClientList()
     self.clientName: str = ""
     self.currentClient: str = ""
     self.clientButton: str = ""
@@ -78,7 +81,8 @@ class ClientModel:
   def saveClient(self):
     # create a new directory with the name of the client
     newClientDir = os.path.join(self.clientDirectory, self.clientName)
-    os.mkdir(newClientDir)
+    if not os.path.exists(newClientDir):
+      os.mkdir(newClientDir)
 
     with open(os.path.join(newClientDir, 'topics.json'), 'w') as f:
       f.write('{}')
@@ -147,7 +151,8 @@ class ClientModel:
     newClientName = self.clientName
 
     # create the updated client directory
-    os.mkdir(newClientDir)
+    if not os.path.exists(newClientDir):
+      os.mkdir(newClientDir)
 
     # save the client attributes as files to the new directory
     with open(os.path.join(oldClientDir, 'topics.json'), 'r') as r:
@@ -189,10 +194,7 @@ class ClientModel:
   # fetch the list of clients from the directory
   def fetchClientList(self, caller: str):
     # read the client directories from the directory and append them to list
-    clients = []
-    for entry in os.scandir(self.clientDirectory):
-      if entry.is_dir():
-        clients.append(entry.name)
+    clients = self._mainModel.fetchClientList()
     
     # return the list of clients
     return ['New Client'] + (sorted(clients))

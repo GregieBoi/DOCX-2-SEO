@@ -1,6 +1,39 @@
-class MainModel:
-  def __init__(self):
-    self.count = 0  # Initialize the counter to 0
+from PyQt6.QtCore import QObject, pyqtSignal
+import sys
+import __main__
+import os
 
-  def increment(self):
-    self.count += 1  # Increment the counter
+
+# responsibilites of the main model
+# 1. Store any data that is needed by multiple views to all for data to be shared
+#    and updated efficiently
+class MainModel:
+  clientListChanged = pyqtSignal(list)
+
+  def __init__(self):
+    self.clientDirectory: str = self.findClientDirectory()
+    self.clientList = self.fetchClientList()
+
+  # get the client list
+  def getClientList(self):
+    return self.clientList
+
+  # find the client directory
+  def findClientDirectory(self):
+    if getattr(sys, 'frozen', False):
+      return os.path.join(os.path.dirname(sys.executable), 'CLIENTS')
+    return os.path.join(os.path.dirname(__main__.__file__), 'CLIENTS')
+
+  # fetch all clients from the client directory
+  def fetchClientList(self):
+    clients = []
+    for entry in os.scandir(self.clientDirectory):
+      if entry.is_dir():
+        clients.append(entry.name)
+
+    return clients
+  
+  # refresh the client list
+  def refreshClientList(self):
+    self.clientList = self.fetchClientList()
+    self.clientListChanged.emit(self.clientList)
