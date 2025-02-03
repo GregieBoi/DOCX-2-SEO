@@ -32,7 +32,7 @@ class MainView(QWidget):
     self.tabs.addTab(self.generateTab, 'Generate')
     self.topicsModel = TopicsModel(self.mainModel)
     self.topicsModelView = TopicsViewModel(self.topicsModel)
-    self.topicsTab = TopicsView(self)
+    self.topicsTab = TopicsView(self.topicsModelView)
     self.tabs.addTab(self.topicsTab, 'Topics')
     self.setLayout(self.layout)  # Set the layout of the widget
 

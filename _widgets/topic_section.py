@@ -25,7 +25,7 @@ class TopicSections(QWidget):
 
     # Add button to add QLineEdit
     self.add_button = QPushButton("+")
-    self.add_button.clicked.connect(self.add_line_edit)
+    self.add_button.clicked.connect(lambda: self.add_line_edit(""))
     self.button_layout.addWidget(self.add_button)
 
     # Add button to remove QLineEdit
@@ -47,7 +47,7 @@ class TopicSections(QWidget):
 
     self.setLayout(self.layout)
 
-  def add_line_edit(self):
+  def add_line_edit(self, src: str = ""):
     # Create a horizontal layout for the label and QLineEdit
     entry_layout = QHBoxLayout()
 
@@ -57,7 +57,7 @@ class TopicSections(QWidget):
     entry_layout.addWidget(number_label)
 
     # Create the QLineEdit
-    line_edit = QLineEdit()
+    line_edit = QLineEdit(src)
     entry_layout.addWidget(line_edit)
 
     # Add the entry layout to the scroll layout
@@ -99,3 +99,8 @@ class TopicSections(QWidget):
           if sub_item.widget():
             sub_item.widget().deleteLater()
         widget.deleteLater()
+
+  def setSrcs(self, srcs: list[str]):
+    self.links = []
+    for src in srcs:
+      self.add_line_edit(src)

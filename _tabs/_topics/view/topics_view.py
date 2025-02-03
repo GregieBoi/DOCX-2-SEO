@@ -1,13 +1,21 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QHBoxLayout
 from PyQt6.QtCore import Qt
+from _tabs._topics.viewmodel.topics_viewmodel import TopicsViewModel
 from _widgets.labeled_line_edit import LabeledLineEdit
 from _widgets.labeled_dropdown import LabeledDropdown
 from _widgets.topic_section import TopicSections
 
 class TopicsView(QWidget):
-  def __init__(self, parent=None):
-    super().__init__(parent)
+  def __init__(self, viewModel: TopicsViewModel):
+    super().__init__()
+    self._viewModel = viewModel
+    self._viewModel.topicSaved.connect(self.updateOnSave)
+    self._viewModel.topicDeleted.connect(self.updateOnDelete)
+    self._viewModel.topicLoaded.connect(self.updateOnTopicLoad)
+    self._viewModel.clientLoaded.connect(self.updateOnClientLoad)
     self.initUI()
+    self._viewModel.initTopics.connect(self.updateOnInit)
+    self._viewModel.startTopics()
 
   def initUI(self):
     self.setWindowTitle('Client')  # Window title
@@ -18,7 +26,9 @@ class TopicsView(QWidget):
 
     # create the client dropdown, topic dropdown, topic name line edit, and link to line edit
     self.clientCombo = LabeledDropdown('Client')
+    self.clientCombo.currentTextChanged.connect(self._viewModel.loadClient)
     self.topicCombo = LabeledDropdown('Topic')
+    self.topicCombo.currentTextChanged.connect(self._viewModel.loadTopic)
     self.topicNameLineEdit = LabeledLineEdit('Topic Name', 'New Topic')
     self.topicLinkLineEdit = LabeledLineEdit('Topic Redirect Link', 'https://www.example.com/topic')
 
@@ -59,9 +69,11 @@ class TopicsView(QWidget):
 
     # create the save and delete buttons
     self.saveButton = QPushButton('Save')
-    self.saveButton.setEnabled(False)
+    self.saveButton.clicked.connect(lambda: self._viewModel.saveTopic(self.topicNameLineEdit.getText(), self.topicLinkLineEdit.getText(), self.heroSection.fetch_links(), self.techSection.fetch_links(), self.interiorSection.fetch_links(), self.miscSection.fetch_links()))
+    #self.saveButton.setEnabled(False)
     self.deleteButton = QPushButton('Delete')
-    self.deleteButton.setEnabled(False)
+    self.deleteButton.clicked.connect(self._viewModel.deleteTopic)
+    #self.deleteButton.setEnabled(False)
     self.deleteButton.setObjectName('destructiveButton')
 
     # add the buttons to the button layout
@@ -73,3 +85,41 @@ class TopicsView(QWidget):
     self.layout.addLayout(self.buttonLayout)
 
     self.setLayout(self.layout)  # Set the layout to the widget
+    
+  def updateOnSave(self, topicName, topicList):
+    self.topicCombo.clear()
+    self.topicCombo.addItems(topicList)
+    self.topicCombo.setCurrentText(topicName)
+    self.topicNameLineEdit.setText(topicName)
+
+  def updateOnDelete(self, topicList):
+    self.topicCombo.clear()
+    self.topicCombo.addItems(topicList)
+    self.topicCombo.setCurrentText("New Topic")
+
+  def updateOnTopicLoad(self, currentClient, selectedTopic, topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs):
+    self.heroSection.clear()
+    self.techSection.clear()
+    self.interiorSection.clear()
+    self.miscSection.clear()
+    
+    self.clientCombo.setCurrentText(currentClient)
+    self.topicCombo.setCurrentText(selectedTopic)
+    self.topicNameLineEdit.setText(topicName)
+    self.topicLinkLineEdit.setText(topicLink)
+    self.heroSection.setSrcs(topicHeroSrcs)
+    self.techSection.setSrcs(topicTechSrcs)
+    self.interiorSection.setSrcs(topicInteriorSrcs)
+    self.miscSection.setSrcs(topicMiscSrcs)
+
+  def updateOnClientLoad(self, currentClient, topicList):
+    self.clientCombo.setCurrentText(currentClient)
+    self.topicCombo.clear()
+    self.topicCombo.addItems(topicList)
+    self.topicCombo.setCurrentText("New Topic")
+
+  def updateOnInit(self, clientList, topicList):
+    print(topicList)
+    self.topicCombo.clear()
+    self.clientCombo.clear()
+    self.clientCombo.addItems(clientList)

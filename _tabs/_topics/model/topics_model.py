@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QObject, pyqtSignal
 from model.main_model import MainModel
 import json
 import os
@@ -29,6 +29,8 @@ IMAGESTYPEHINT = TypedDict('Images', {'hero': list[str], 'tech': list[str], 'int
 TOPICSTYPEHINT = TypedDict('Topic', {'link': str, 'images': IMAGESTYPEHINT})
 
 class TopicsModel(QObject):
+  clientListChanged = pyqtSignal(list)
+
   def __init__(self, mainModel: MainModel):
     self._mainModel: MainModel = mainModel
     self.clientDirectory: str = self._mainModel.findClientDirectory()
@@ -43,6 +45,30 @@ class TopicsModel(QObject):
     self.topicTechSrcs: list[str] = []
     self.topicInteriorSrcs: list[str] = []
     self.topicMiscSrcs: list[str] = []
+
+  def setTopicList(self, topicList: list[str]):
+    self.topicList = topicList
+
+  def getTopicList(self):
+    return self.topicList
+  
+  def setClientList(self, clientList: list[str]):
+    self.clientList = clientList
+
+  def getClientList(self):
+    return self.clientList
+  
+  def setCurrentClient(self, client: str):
+    self.currentClient = client
+
+  def getCurrentClient(self):
+    return self.currentClient
+  
+  def setSelectedTopic(self, topic: str):
+    self.selectedTopic = topic
+
+  def getSelectedTopic(self):
+    return self.selectedTopic
 
   def setTopicName(self, name: str):
     self.topicName = name
@@ -80,8 +106,13 @@ class TopicsModel(QObject):
   def getTopicMiscSrcs(self):
     return self.topicMiscSrcs
   
-  # reset the topic attributes
+  # clear topic and client attributes
   def clear(self):
+    self.clearTopic()
+    self.currentClient = self.clientList[0]
+
+  # reset the topic attributes
+  def clearTopic(self):
     self.topicName = ""
     self.selectedTopic = self.topicList[0]
     self.topicLink = ""
@@ -120,8 +151,8 @@ class TopicsModel(QObject):
 
   # load the selected topic
   def loadTopic(self, topicName: str):
-    
-    self.clear()
+    print(topicName)
+    self.clearTopic()
 
     if topicName in ["New Topic", "", None]:
       self.selectedTopic = "New Topic"
@@ -136,6 +167,15 @@ class TopicsModel(QObject):
     self.topicInteriorSrcs = self.topicsJson[topicName]['images']['interior']
     self.topicMiscSrcs = self.topicsJson[topicName]['images']['misc']
 
+    print("-------------------------------")
+    print(self.selectedTopic)
+    print(self.topicName)
+    print(self.topicLink)
+    print(self.topicHeroSrcs)
+    print(self.topicTechSrcs)
+    print(self.topicInteriorSrcs)
+    print(self.topicMiscSrcs)
+
   # delete the selected topic
   def deleteTopic(self):
     
@@ -144,14 +184,14 @@ class TopicsModel(QObject):
       json.dump(self.topicsJson, f, indent=2)
       f.close()
 
-    self.clear()
+    self.clearTopic()
     self.refreshTopicList()
     
   # fetch the list of topics from the clients topic.json
   def fetchTopicList(self):
-    topics = ['New Topic']
+    topics = []
     for topic in self.topicsJson.keys(): topics.append(topic) 
-    return topics
+    return ['New Topic'] + sorted(topics)
 
   # fetch the topics.json file as a dictionary
   def fetchTopicsJSON(self):
@@ -159,3 +199,12 @@ class TopicsModel(QObject):
       self.topicsJson = json.load(f)
       f.close()
     return self.topicsJson
+  
+  # load the selected client
+  def loadClient(self, clientName: str):
+    
+    self.clear()
+
+    self.currentClient = clientName
+    self.topicsJson = self.fetchTopicsJSON()
+    self.topicList = self.fetchTopicList()
