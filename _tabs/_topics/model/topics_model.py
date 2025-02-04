@@ -153,7 +153,6 @@ class TopicsModel(QObject):
 
   # load the selected topic
   def loadTopic(self, topicName: str):
-    print(topicName)
     self.clearTopic()
 
     if topicName in ["New Topic", "", None]:
@@ -168,15 +167,6 @@ class TopicsModel(QObject):
     self.topicTechSrcs = self.topicsJson[topicName]['images']['tech']
     self.topicInteriorSrcs = self.topicsJson[topicName]['images']['interior']
     self.topicMiscSrcs = self.topicsJson[topicName]['images']['misc']
-
-    print("-------------------------------")
-    print(self.selectedTopic)
-    print(self.topicName)
-    print(self.topicLink)
-    print(self.topicHeroSrcs)
-    print(self.topicTechSrcs)
-    print(self.topicInteriorSrcs)
-    print(self.topicMiscSrcs)
 
   # delete the selected topic
   def deleteTopic(self):

@@ -32,8 +32,6 @@ class MainModel(QObject):
       if entry.is_dir():
         clients.append(entry.name)
 
-    print("---------------------------------------\nThe Client List In The Main Model is: " + str(clients))
-
     return sorted(clients)
   
   # refresh the client list

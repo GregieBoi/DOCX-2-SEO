@@ -125,8 +125,6 @@ class TopicsView(QWidget):
 
   def saveClick(self, topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs):
     
-    print(topicName)
-    print(self._viewModel.getTopicList())
     if (topicName != self.topicCombo.getCurrentText()) and topicName in self._viewModel.getTopicList():
       warning = "A topic with the name " + topicName + " already exists. Would you like to overwrite it?"
       destructiveButtonText = "Overwrite"
@@ -182,7 +180,6 @@ class TopicsView(QWidget):
     self.topicCombo.setCurrentText("New Topic")
 
   def updateOnInit(self, clientList, topicList):
-    print(topicList)
     self.topicCombo.clear()
     self.clientCombo.clear()
     self.clientCombo.addItems(clientList)
