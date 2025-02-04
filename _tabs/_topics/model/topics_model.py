@@ -32,7 +32,9 @@ class TopicsModel(QObject):
   clientListChanged = pyqtSignal(list)
 
   def __init__(self, mainModel: MainModel):
-    self._mainModel: MainModel = mainModel
+    super().__init__()
+    self._mainModel = mainModel
+    self._mainModel.clientListChanged.connect(self.refreshClientList)
     self.clientDirectory: str = self._mainModel.findClientDirectory()
     self.clientList: list[str] = self._mainModel.getClientList()
     self.currentClient: str = self.clientList[0]
@@ -208,3 +210,7 @@ class TopicsModel(QObject):
     self.currentClient = clientName
     self.topicsJson = self.fetchTopicsJSON()
     self.topicList = self.fetchTopicList()
+
+  def refreshClientList(self, clientList: list):
+    self.clientList = clientList
+    self.clientListChanged.emit(self.clientList)

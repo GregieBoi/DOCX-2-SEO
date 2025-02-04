@@ -193,7 +193,9 @@ class ClientModel(QObject):
   # fetch the list of clients from the directory
   def fetchClientList(self, caller: str):
     # read the client directories from the directory and append them to list
-    clients = self._mainModel.fetchClientList()
+    clients = self._mainModel.refreshClientList()
+
+    print("---------------------------------------\nThe Client List In The Client Model is: " + str(clients))
     
     # return the list of clients
-    return ['New Client'] + (sorted(clients))
+    return ['New Client'] + (clients)

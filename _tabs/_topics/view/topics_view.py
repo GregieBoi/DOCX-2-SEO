@@ -10,6 +10,7 @@ class TopicsView(QWidget):
   def __init__(self, viewModel: TopicsViewModel):
     super().__init__()
     self._viewModel = viewModel
+    self._viewModel.clientListChanged.connect(self.updateOnClientListChange)
     self._viewModel.topicSaved.connect(self.updateOnSave)
     self._viewModel.topicDeleted.connect(self.updateOnDelete)
     self._viewModel.topicLoaded.connect(self.updateOnTopicLoad)
@@ -185,3 +186,14 @@ class TopicsView(QWidget):
     self.topicCombo.clear()
     self.clientCombo.clear()
     self.clientCombo.addItems(clientList)
+
+  def updateOnClientListChange(self, clientList):
+    self.clientCombo.blockSignals(True)
+    self.clientCombo.clear()
+    self.clientCombo.addItems(clientList)
+    if self._viewModel.getCurrentClient() in clientList:
+      self.clientCombo.setCurrentText(self._viewModel.getCurrentClient())
+    else:
+      self.clientCombo.setCurrentText(clientList[0])
+      self._viewModel.loadClient(self.clientCombo.getCurrentText())
+    self.clientCombo.blockSignals(False)

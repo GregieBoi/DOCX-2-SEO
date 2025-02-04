@@ -12,6 +12,7 @@ class TopicsViewModel(QObject):
   def __init__(self, model: TopicsModel):
     super().__init__()
     self._model = model
+    self._model.clientListChanged.connect(self.refreshClientList)
 
   def saveTopic(self, topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs):
     self._model.setTopicName(topicName)
@@ -43,3 +44,9 @@ class TopicsViewModel(QObject):
   
   def getTopicList(self):
     return self._model.getTopicList()
+  
+  def refreshClientList(self, clientList: list):
+    self.clientListChanged.emit(clientList)
+
+  def getCurrentClient(self):
+    return self._model.getCurrentClient()

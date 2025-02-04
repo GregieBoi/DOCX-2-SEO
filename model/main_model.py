@@ -7,10 +7,11 @@ import os
 # responsibilites of the main model
 # 1. Store any data that is needed by multiple views to all for data to be shared
 #    and updated efficiently
-class MainModel:
+class MainModel(QObject):
   clientListChanged = pyqtSignal(list)
 
   def __init__(self):
+    super().__init__()
     self.clientDirectory: str = self.findClientDirectory()
     self.clientList = self.fetchClientList()
 
@@ -31,9 +32,12 @@ class MainModel:
       if entry.is_dir():
         clients.append(entry.name)
 
-    return clients
+    print("---------------------------------------\nThe Client List In The Main Model is: " + str(clients))
+
+    return sorted(clients)
   
   # refresh the client list
   def refreshClientList(self):
     self.clientList = self.fetchClientList()
     self.clientListChanged.emit(self.clientList)
+    return self.clientList
