@@ -40,3 +40,6 @@ class TopicsViewModel(QObject):
 
   def getClientList(self):
     return self._model.getClientList()
+  
+  def getTopicList(self):
+    return self._model.getTopicList()

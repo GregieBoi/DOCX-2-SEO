@@ -1,6 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QDialog, QWidget, QVBoxLayout, QPushButton, QHBoxLayout
 from PyQt6.QtCore import Qt
 from _tabs._topics.viewmodel.topics_viewmodel import TopicsViewModel
+from _modals.destructive_modal import DestructiveModal
 from _widgets.labeled_line_edit import LabeledLineEdit
 from _widgets.labeled_dropdown import LabeledDropdown
 from _widgets.topic_section import TopicSections
@@ -27,10 +28,14 @@ class TopicsView(QWidget):
     # create the client dropdown, topic dropdown, topic name line edit, and link to line edit
     self.clientCombo = LabeledDropdown('Client')
     self.clientCombo.currentTextChanged.connect(self._viewModel.loadClient)
+    self.clientCombo.currentTextChanged.connect(self.canDelete)
     self.topicCombo = LabeledDropdown('Topic')
     self.topicCombo.currentTextChanged.connect(self._viewModel.loadTopic)
+    self.topicCombo.currentTextChanged.connect(self.canDelete)
     self.topicNameLineEdit = LabeledLineEdit('Topic Name', 'New Topic')
+    self.topicNameLineEdit.textChanged.connect(self.canSave)
     self.topicLinkLineEdit = LabeledLineEdit('Topic Redirect Link', 'https://www.example.com/topic')
+    self.topicLinkLineEdit.textChanged.connect(self.canSave)
 
     # add the widgets to the topic selection layout
     self.topicSelectionLayout.addWidget(self.clientCombo)
@@ -69,11 +74,11 @@ class TopicsView(QWidget):
 
     # create the save and delete buttons
     self.saveButton = QPushButton('Save')
-    self.saveButton.clicked.connect(lambda: self._viewModel.saveTopic(self.topicNameLineEdit.getText(), self.topicLinkLineEdit.getText(), self.heroSection.fetch_links(), self.techSection.fetch_links(), self.interiorSection.fetch_links(), self.miscSection.fetch_links()))
-    #self.saveButton.setEnabled(False)
+    self.saveButton.clicked.connect(lambda: self.saveClick(self.topicNameLineEdit.getText(), self.topicLinkLineEdit.getText(), self.heroSection.fetch_links(), self.techSection.fetch_links(), self.interiorSection.fetch_links(), self.miscSection.fetch_links()))
+    self.saveButton.setEnabled(False)
     self.deleteButton = QPushButton('Delete')
-    self.deleteButton.clicked.connect(self._viewModel.deleteTopic)
-    #self.deleteButton.setEnabled(False)
+    self.deleteButton.clicked.connect(self.deleteClick)
+    self.deleteButton.setEnabled(False)
     self.deleteButton.setObjectName('destructiveButton')
 
     # add the buttons to the button layout
@@ -85,6 +90,63 @@ class TopicsView(QWidget):
     self.layout.addLayout(self.buttonLayout)
 
     self.setLayout(self.layout)  # Set the layout to the widget
+
+  def canSave(self):
+    name = self.topicNameLineEdit.getText()
+    link = self.topicLinkLineEdit.getText()
+    whyNot = ""
+    if name.isspace() or name == "":
+      whyNot += "You must enter a name for the topic \n"
+    elif name == "New Topic":
+      whyNot += "You cannot use the name 'New Topic' \n"
+    
+    if link.isspace() or link == "":
+      whyNot += "You must enter a link for the topic \n"
+    elif link.startswith("http://") == False and link.startswith("https://") == False:
+      whyNot += "You must enter a valid link for the topic \n"
+
+    if whyNot:
+      self.saveButton.setEnabled(False)
+      self.saveButton.setToolTip(whyNot[:-2])
+      return
+    
+    self.saveButton.setEnabled(True)
+    self.saveButton.setToolTip("")
+
+  def canDelete(self):
+    if self.topicCombo.getCurrentText() == "New Topic":
+      self.deleteButton.setEnabled(False)
+      self.deleteButton.setToolTip("You can only delete saved topics")
+      return
+    
+    self.deleteButton.setEnabled(True)
+    self.deleteButton.setToolTip("")
+
+  def saveClick(self, topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs):
+    
+    print(topicName)
+    print(self._viewModel.getTopicList())
+    if (topicName != self.topicCombo.getCurrentText()) and topicName in self._viewModel.getTopicList():
+      warning = "A topic with the name " + topicName + " already exists. Would you like to overwrite it?"
+      destructiveButtonText = "Overwrite"
+      dialog = DestructiveModal(warning, destructiveButtonText)
+      dialog.exec()
+
+      if dialog.result() == QDialog.DialogCode.Accepted:
+        self._viewModel.saveTopic(topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs)
+      
+      return
+
+    self._viewModel.saveTopic(topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs)
+
+  def deleteClick(self):
+    warning = "Are you sure you want to delete " + self.topicCombo.getCurrentText() + " from the topic list? This action cannot be undone."
+    destructiveButtonText = "Delete"
+    dialog = DestructiveModal(warning, destructiveButtonText)
+    dialog.exec()
+
+    if dialog.result() == QDialog.DialogCode.Accepted:
+      self._viewModel.deleteTopic()
     
   def updateOnSave(self, topicName, topicList):
     self.topicCombo.clear()
