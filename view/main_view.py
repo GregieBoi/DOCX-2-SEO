@@ -5,6 +5,8 @@ from model.main_model import MainModel
 from _tabs._client.model.client_model import ClientModel
 from _tabs._client.viewmodel.client_viewmodel import ClientViewModel
 from _tabs._client.view.client_view import ClientView
+from _tabs._generate.model.generate_model import GenerateModel
+from _tabs._generate.viewmodel.generate_viewmodel import GenerateViewModel
 from _tabs._generate.view.generate_view import GenerateView
 from _tabs._topics.view.topics_view import TopicsView
 from _tabs._topics.model.topics_model import TopicsModel
@@ -28,7 +30,9 @@ class MainView(QWidget):
     self.clientModelView = ClientViewModel(self.clientModel)
     self.clientTab = ClientView(self.clientModelView)
     self.tabs.addTab(self.clientTab, 'Client')
-    self.generateTab = GenerateView(self)
+    self.generateModel = GenerateModel(self.mainModel)
+    self.generateModelView = GenerateViewModel(self.generateModel)
+    self.generateTab = GenerateView(self.generateModelView)
     self.tabs.addTab(self.generateTab, 'Generate')
     self.topicsModel = TopicsModel(self.mainModel)
     self.topicsModelView = TopicsViewModel(self.topicsModel)
