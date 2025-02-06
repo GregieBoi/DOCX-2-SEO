@@ -120,8 +120,16 @@ class GenerateView(QWidget):
       altText = dialog.getAltText()
       imageSrcs = dialog.getImageList()
       downloadPath, _ = QFileDialog.getSaveFileName(self, 'Download File', self.lastDownloadDir, '*.html')
+      if not downloadPath:
+        self.manualGenerateButton.setEnabled(True)
+        self.automaticGenerateButton.setEnabled(True)
+        self.manualGenerateButton.setText("Failed!")
+        self.automaticGenerateButton.setText("Failed!")
+        QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
+        QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+        return
       self.lastDownloadDir = os.path.dirname(downloadPath)
-      self._viewModel.generateHTML(autoSelect, imageSrcs, altText, self.manualButtonOverride.getText(), self.manualLinkOverride.getText(), downloadPath)
+      self._viewModel.generateHTML(autoSelect, imageSrcs, altText, self.manualButtonOverride.getText(), self.manualLinkOverride.getText(), downloadPath, downloadPath)
       self.manualGenerateButton.setEnabled(True)
       self.automaticGenerateButton.setEnabled(True)
       self.manualGenerateButton.setText("Generated!")

@@ -16,11 +16,11 @@ class GenerateViewModel(QObject):
     self._model.clientListChanged.connect(self.refreshClientList)
     self._model.topicListChanged.connect(self.refreshTopicList)
 
-  def generateHTML(self, autoSelect: bool, imageSrcs: list[str], altText: str, buttonTextOverride: str, linkOverride: str, htmlPath: str):
-    self._model.setLastDownloadDir(htmlPath)
+  def generateHTML(self, autoSelect: bool, imageSrcs: list[str], altText: str, buttonTextOverride: str, linkOverride: str, docxPath: str, savePath: str):
+    self._model.setLastDownloadDir(docxPath)
     self._model.setButtonTextOverride(buttonTextOverride)
     self._model.setLinkOverride(linkOverride)
-    self._model.generateHTML(autoSelect, imageSrcs, altText)
+    self._model.generateHTML(autoSelect, imageSrcs, altText, savePath)
     self.htmlGenerated.emit(True)
 
   def loadClient(self, clientName):

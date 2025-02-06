@@ -160,12 +160,12 @@ class GenerateModel(QObject):
     soup = self.convertDocx(self.docxPath)
     self.imgsNeeded = len(soup.find_all('h1')) - 1
 
-  def generateHTML(self, autoSelect: bool, imageSrcs: list[str], altText: str):
+  def generateHTML(self, autoSelect: bool, imageSrcs: list[str], altText: str, savePath: str):
     html = self.convertDocx(self.docxPath)
-    self.SOUP(html)
+    html = self.SOUP(html)
     self.populateImgSrcs(html, autoSelect, imageSrcs, altText)
     self.populateBtns(html, autoSelect)
-    self.saveHTML(str(html), self.lastUploadDir + '/' + 'test.html')
+    self.saveHTML(str(html), savePath)
 
   def convertDocx(self, path: str):
     print(path)
@@ -176,8 +176,6 @@ class GenerateModel(QObject):
       return html
     
   def SOUP(self, html: BeautifulSoup):
-
-    print(html)
 
     self.clearATags(html)
     
@@ -194,7 +192,7 @@ class GenerateModel(QObject):
     self.formatDisclaimerSOUP(html)
 
     # wrap the content sections in the client's wrapper
-    self.wrapContentSOUP(html)
+    html = self.wrapContentSOUP(html)
 
     # add the client's styling to the html
     self.addStyleSOUP(html)
@@ -228,6 +226,9 @@ class GenerateModel(QObject):
       btn = BeautifulSoup(button, 'html.parser')
       img.insert_before(btn)
 
+    btn = BeautifulSoup(button, 'html.parser')
+    html.append(btn)
+
   def wrapContentSOUP(self, html: BeautifulSoup):
     wrapperPath = os.path.join(self.clientDirectory, self.currentClient, 'wrapper.html')
     wrapper = ''
@@ -256,7 +257,10 @@ class GenerateModel(QObject):
       
       newSOUP.append(wrap)
 
-    html = newSOUP
+    print("\n\n\n---------------New SOUP---------------\n\n\n")
+    print(newSOUP)
+
+    return newSOUP
 
   def fixTableSOUP(self, html: BeautifulSoup):
     for th in html.find_all('th'):
@@ -357,6 +361,9 @@ class GenerateModel(QObject):
     
   def populateBtns(self, html: BeautifulSoup, autoSelect: bool):
     for btn in html.find_all('a'):
+      if btn.string.startswith('https://'):
+        continue
+
       if autoSelect:
         btn['href'] = self.topicLink if self.linkOverride == '' else self.linkOverride
         btn.string = self.selectedTopic if self.buttonTextOverride == '' else self.buttonTextOverride
@@ -372,9 +379,10 @@ class GenerateModel(QObject):
       btn['onclick'] = "window.location.href='" + self.linkOverride + "'"
       btn.string = 'View Inventory' if self.buttonTextOverride == '' else self.buttonTextOverride
 
-  def saveHTML(self, html: BeautifulSoup, path: str):
+  def saveHTML(self, html: str, path: str):
     with open(path, 'w') as f:
       f.write(html)
+      print("saved to " + path)
 
   # fetch the topics.json file as a dictionary
   def fetchTopicsJSON(self):
