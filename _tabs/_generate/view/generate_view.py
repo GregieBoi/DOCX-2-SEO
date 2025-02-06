@@ -58,7 +58,7 @@ class GenerateView(QWidget):
     # create the button override, link override, and button widgets for manual
     self.manualButtonOverride = LabeledLineEdit('Button Override', "View Inventory")
     self.manualLinkOverride = LabeledLineEdit('Link Override', "https://www.client.com")
-    self.manualGenerateButton = QPushButton('Generate')
+    self.manualGenerateButton = QPushButton('Generate SEO')
     self.manualGenerateButton.clicked.connect(lambda: self.generateClick(False))
     self.manualGenerateButton.setEnabled(False)
 
@@ -83,7 +83,7 @@ class GenerateView(QWidget):
     self.automaticTopicCombo.currentTextChanged.connect(lambda: self._viewModel.loadTopic(self.automaticTopicCombo.getCurrentText()))
     self.automaticButtonOverride = LabeledLineEdit('Button Override', "View Inventory")
     self.automaticLinkOverride = LabeledLineEdit('Link Override', "https://www.client.com")
-    self.automaticGenerateButton = QPushButton('Generate')
+    self.automaticGenerateButton = QPushButton('Generate SEO')
     self.automaticGenerateButton.clicked.connect(lambda: self.generateClick(True))
     self.automaticGenerateButton.setEnabled(False)
 
@@ -117,8 +117,8 @@ class GenerateView(QWidget):
         self.automaticGenerateButton.setEnabled(True)
         self.manualGenerateButton.setText("Generated!")
         self.automaticGenerateButton.setText("Generated!")
-        QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-        QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+        QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+        QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
         return
       altText = dialog.getAltText()
       imageSrcs = dialog.getImageList()
@@ -128,8 +128,8 @@ class GenerateView(QWidget):
         self.automaticGenerateButton.setEnabled(True)
         self.manualGenerateButton.setText("Failed!")
         self.automaticGenerateButton.setText("Failed!")
-        QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-        QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+        QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+        QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
         return
       self.lastDownloadDir = os.path.dirname(downloadPath)
       self._viewModel.generateHTML(autoSelect, imageSrcs, altText, self.manualButtonOverride.getText(), self.manualLinkOverride.getText(), downloadPath, downloadPath)
@@ -137,8 +137,8 @@ class GenerateView(QWidget):
       self.automaticGenerateButton.setEnabled(True)
       self.manualGenerateButton.setText("Generated!")
       self.automaticGenerateButton.setText("Generated!")
-      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
       return
     
     downloadPath, _ = QFileDialog.getSaveFileName(self, 'Download File', self.lastDownloadDir, '*.html')
@@ -147,8 +147,8 @@ class GenerateView(QWidget):
       self.automaticGenerateButton.setEnabled(True)
       self.manualGenerateButton.setText("Failed!")
       self.automaticGenerateButton.setText("Failed!")
-      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
       return
     self.lastDownloadDir = os.path.dirname(downloadPath)
     self._viewModel.generateHTML(autoSelect, [], "topic", self.automaticButtonOverride.getText(), self.automaticLinkOverride.getText(), downloadPath, downloadPath)
@@ -156,8 +156,8 @@ class GenerateView(QWidget):
     self.automaticGenerateButton.setEnabled(True)
     self.manualGenerateButton.setText("Generated!")
     self.automaticGenerateButton.setText("Generated!")
-    QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-    QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+    QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+    QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
 
   def uploadClick(self):
     self.uploadButton.button.setText("Uploading...")
@@ -199,15 +199,15 @@ class GenerateView(QWidget):
       self.automaticGenerateButton.setEnabled(True)
       self.manualGenerateButton.setText("Generated!")
       self.automaticGenerateButton.setText("Generated!")
-      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
     else: 
       self.manualGenerateButton.setEnabled(True)
       self.automaticGenerateButton.setEnabled(True)
       self.manualGenerateButton.setText("Failed!")
       self.automaticGenerateButton.setText("Failed!")
-      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
-      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate SEO"))
+      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate SEO"))
     
   def updateOnInit(self, clientList: list[str], topicList: list[str]):
     self.clientCombo.clear()
@@ -220,8 +220,10 @@ class GenerateView(QWidget):
   def updateOnClientOrTopicListChange(self, list: list[str]):
     currentClient = self.clientCombo.getCurrentText()
     clientList = self._viewModel.getClientList()
+    currentTopic = self.automaticTopicCombo.getCurrentText()
     self.clientCombo.blockSignals(True)
     self.clientCombo.clear()
     self.clientCombo.blockSignals(False)
     self.clientCombo.addItems(clientList)
     self.clientCombo.setCurrentText(currentClient)
+    self.automaticTopicCombo.setCurrentText(currentTopic)

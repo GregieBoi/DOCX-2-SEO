@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QDialog, QWidget, QVBoxLayout, QPushButton, QHBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from _tabs._topics.viewmodel.topics_viewmodel import TopicsViewModel
 from _modals.destructive_modal import DestructiveModal
 from _widgets.labeled_line_edit import LabeledLineEdit
@@ -74,7 +74,7 @@ class TopicsView(QWidget):
     self.buttonLayout = QHBoxLayout()
 
     # create the save and delete buttons
-    self.saveButton = QPushButton('Save')
+    self.saveButton = QPushButton('Save Topic')
     self.saveButton.clicked.connect(lambda: self.saveClick(self.topicNameLineEdit.getText(), self.topicLinkLineEdit.getText(), self.heroSection.fetch_links(), self.techSection.fetch_links(), self.interiorSection.fetch_links(), self.miscSection.fetch_links()))
     self.saveButton.setEnabled(False)
     self.deleteButton = QPushButton('Delete')
@@ -125,27 +125,52 @@ class TopicsView(QWidget):
 
   def saveClick(self, topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs):
     
+    self.saveButton.setEnabled(False)
+    self.saveButton.setText("Saving...")
+
     if (topicName != self.topicCombo.getCurrentText()) and topicName in self._viewModel.getTopicList():
       warning = "A topic with the name " + topicName + " already exists. Would you like to overwrite it?"
       destructiveButtonText = "Overwrite"
       dialog = DestructiveModal(warning, destructiveButtonText)
       dialog.exec()
+      self.saveButton.setEnabled(False)
+      self.saveButton.setText("Saving...")
 
       if dialog.result() == QDialog.DialogCode.Accepted:
         self._viewModel.saveTopic(topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs)
-      
+        self.saveButton.setEnabled(True)
+        self.saveButton.setText("Saved!")
+        QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Topic"))
+        return
+      self.saveButton.setEnabled(True)
+      self.saveButton.setText("Cancelled!")
+      QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Topic"))
       return
 
     self._viewModel.saveTopic(topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs)
+    self.saveButton.setEnabled(True)
+    self.saveButton.setText("Saved!")
+    QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Topic"))
 
   def deleteClick(self):
+    self.deleteButton.setEnabled(False)
+    self.deleteButton.setText("Deleting...")
     warning = "Are you sure you want to delete " + self.topicCombo.getCurrentText() + " from the topic list? This action cannot be undone."
     destructiveButtonText = "Delete"
     dialog = DestructiveModal(warning, destructiveButtonText)
     dialog.exec()
+    self.deleteButton.setEnabled(False)
+    self.deleteButton.setText("Deleting...")
 
     if dialog.result() == QDialog.DialogCode.Accepted:
       self._viewModel.deleteTopic()
+      self.deleteButton.setText("Deleted!")
+      QTimer.singleShot(1500, lambda: self.deleteButton.setText("Delete"))
+      return
+    
+    self.deleteButton.setEnabled(True)
+    self.deleteButton.setText("Cancelled!")
+    QTimer.singleShot(1500, lambda: self.deleteButton.setText("Delete"))
     
   def updateOnSave(self, topicName, topicList):
     self.topicCombo.clear()

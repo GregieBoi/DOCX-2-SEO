@@ -34,7 +34,6 @@ class GenerateModel(QObject):
     self._mainModel: MainModel = mainModel
     self._mainModel.clientListChanged.connect(self.refreshClientList)
     self._mainModel.topicListChanged.connect(self.refreshClientList)
-    #self.topicListChanged.connect(self.refreshTopicList)
     self.clientDirectory: str = self._mainModel.findClientDirectory()
     self.clientList: list[str] = self._mainModel.getClientList()
     self.currentClient: str = self.clientList[0]
@@ -169,7 +168,6 @@ class GenerateModel(QObject):
     self.saveHTML(str(html), savePath)
 
   def convertDocx(self, path: str):
-    print(path)
     with open(path, 'rb') as f:
       parsed = mammoth.convert_to_html(f)
       html = BeautifulSoup(parsed.value, 'html.parser')
@@ -262,8 +260,7 @@ class GenerateModel(QObject):
 
   def fixTableSOUP(self, html: BeautifulSoup):
     for th in html.find_all('th'):
-      print(th)
-      child = th.findchildren()[0]
+      child = th.findChildren()[0]
       td = html.new_tag('td')
       td.append(child)
       th.replace_with(td)
@@ -328,9 +325,7 @@ class GenerateModel(QObject):
     keywordCounts = Counter(
       keyword for keyword in KEYWORDS if keyword in h1Text.lower()
     )
-    print(keywordCounts)
     if not keywordCounts:
-      print("no keywords found")
       if len(self.topicMiscSrcs) > 0:
         pick = random.choice(self.topicMiscSrcs)
         self.topicMiscSrcs.remove(pick)
@@ -353,37 +348,30 @@ class GenerateModel(QObject):
     keyword = keywordCounts.most_common(1)[0][0]
     category = KEYWORDS[keyword]
     if category == 'hero' and len(self.topicHeroSrcs) > 0:
-      print("picking hero")
       pick = random.choice(self.topicHeroSrcs)
       self.topicHeroSrcs.remove(pick)
       return pick
     elif category == 'tech' and len(self.topicTechSrcs) > 0:
-      print("picking tech")
       pick = random.choice(self.topicTechSrcs)
       self.topicTechSrcs.remove(pick)
       return pick
     elif category == 'interior' and len(self.topicInteriorSrcs) > 0:
-      print("picking interior")
       pick = random.choice(self.topicInteriorSrcs)
       self.topicInteriorSrcs.remove(pick)
       return pick
     elif len(self.topicMiscSrcs) > 0:
-      print("picking misc")
       pick = random.choice(self.topicMiscSrcs)
       self.topicMiscSrcs.remove(pick)
       return pick
     elif len(self.topicInteriorSrcs) > 0:
-      print("picking interior as secondary")
       pick = random.choice(self.topicInteriorSrcs)
       self.topicInteriorSrcs.remove(pick)
       return pick
     elif len(self.topicTechSrcs) > 0:
-      print("picking tech as secondary")
       pick = random.choice(self.topicTechSrcs)
       self.topicTechSrcs.remove(pick)
       return pick
     elif len(self.topicHeroSrcs) > 0:
-      print("picking hero as secondary")
       pick = random.choice(self.topicHeroSrcs)
       self.topicHeroSrcs.remove(pick)
       return pick
@@ -414,11 +402,9 @@ class GenerateModel(QObject):
   def saveHTML(self, html: str, path: str):
     with open(path, 'w') as f:
       f.write(html)
-      print("saved to " + path)
 
   # fetch the topics.json file as a dictionary
   def fetchTopicsJSON(self):
-    print("---------------fetchTopicsJSON---------------")
     with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'r') as f:
       self.topicsJson = json.load(f)
       f.close()
@@ -431,7 +417,6 @@ class GenerateModel(QObject):
     return sorted(topics)
   
   def loadClient(self, clientName: str):
-    print("---------------loadClient---------------")
     self.clear()
 
     self.currentClient = clientName
@@ -444,8 +429,6 @@ class GenerateModel(QObject):
     self.topicListChanged.emit(self.topicList)
 
   def refreshTopicList(self, topicList: list):
-    print("---------------refreshTopicList---------------")
-    print(topicList)
     self.topicsJson = self.fetchTopicsJSON()
     self.topicList = self.fetchTopicList()
     self.topicListChanged.emit(self.topicList)

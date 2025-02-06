@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QDialog, QVBoxLayout, QPushButton, QHBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from _tabs._client.viewmodel.client_viewmodel import ClientViewModel
 from _widgets.labeled_dropdown import LabeledDropdown
 from _widgets.labeled_line_edit import LabeledLineEdit
@@ -57,7 +57,7 @@ class ClientView(QWidget):
     self.buttonLayout = QHBoxLayout()
 
     # create the buttons for the button layout
-    self.saveButton = QPushButton('Save')
+    self.saveButton = QPushButton('Save Client')
     self.saveButton.setEnabled(False)
     self.saveButton.clicked.connect(lambda: self.saveClick(self.clientName.getText(), self.clientButton.getText(), self.clientStyle.getText(), self.clientWrapper.getText()))
     self.deleteButton = QPushButton('Delete')
@@ -131,13 +131,11 @@ class ClientView(QWidget):
   # checks if the selected client is an existing client and enables or disables the delete button
   def canUpdateOrDelete(self):
     if self.clientCombo.getCurrentText() == "New Client":
-      self.saveButton.setText("Save Client")
       self.clientName.setPlaceholderText("New Client")
       self.deleteButton.setEnabled(False)
       self.deleteButton.setToolTip("You can only delete saved clients")
       return
     
-    self.saveButton.setText("Update Client")
     self.clientName.setPlaceholderText(self.clientCombo.getCurrentText())
     self.deleteButton.setEnabled(True)
     self.deleteButton.setToolTip("")
@@ -145,6 +143,8 @@ class ClientView(QWidget):
   # handle update confirmation if conflict and send data to viewmodel for saving or updating
   def saveClick(self, clientName, clientButton, clientStyle, clientWrapper):
     if self.clientCombo.getCurrentText() == "New Client":
+      self.saveButton.setEnabled(False)
+      self.saveButton.setText("Saving...")
       if self.clientName.getText().lower() in [x.lower() for x in self._viewModel.getClientList()]:
         warning = "A client with the name " + self.clientName.getText() + " already exists. Would you like to replace the existing client? This action cannot be undone!"
         destructiveButtonText = "Replace"
@@ -157,9 +157,18 @@ class ClientView(QWidget):
             if client.lower() == self.clientName.getText().lower():
               clientName = clients[i]
           self._viewModel.saveClient(clientName, clientButton, clientStyle, clientWrapper)
+          self.saveButton.setEnabled(True)
+          self.saveButton.setText("Saved!")
+          QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Client"))
           return
         else:
+          self.saveButton.setEnabled(True)
+          self.saveButton.setText("Cancelled!")
+          QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Client"))
           return
+      self.saveButton.setEnabled(True)
+      self.saveButton.setText("Saved!")
+      QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Client"))
       self._viewModel.saveClient(clientName, clientButton, clientStyle, clientWrapper)
       return
 
@@ -168,6 +177,8 @@ class ClientView(QWidget):
       destructiveButtonText = "Replace"
       dialog = DestructiveModal(warning, destructiveButtonText)
       dialog.exec()
+      self.saveButton.setEnabled(False)
+      self.saveButton.setText("Saving...")
 
       if dialog.result() == QDialog.DialogCode.Accepted:
         clients = self._viewModel.getClientList()
@@ -175,14 +186,25 @@ class ClientView(QWidget):
           if client.lower() == self.clientName.getText().lower():
             clientName = clients[i]
         self._viewModel.updateClient(clientName, clientButton, clientStyle, clientWrapper)
+        self.saveButton.setEnabled(True)
+        self.saveButton.setText("Saved!")
+        QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Client"))
         return
       else:
+        self.saveButton.setEnabled(True)
+        self.saveButton.setText("Cancelled!")
+        QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Client"))
         return
-    
+      
+    self.saveButton.setEnabled(True)
+    self.saveButton.setText("Saved!")
+    QTimer.singleShot(1500, lambda: self.saveButton.setText("Save Client"))
     self._viewModel.updateClient(clientName, clientButton, clientStyle, clientWrapper)
 
   # handle delete confirmation and send data to viewmodel for deleting
   def deleteClick(self):
+    self.deleteButton.setEnabled(False)
+    self.deleteButton.setText("Deleting...")
     warning = "Are you sure you want to delete " + self.clientCombo.getCurrentText() + " from the client list? This action cannot be undone."
     destructiveButtonText = "Delete"
     dialog = DestructiveModal(warning, destructiveButtonText)
@@ -190,6 +212,13 @@ class ClientView(QWidget):
 
     if dialog.result() == QDialog.DialogCode.Accepted:
       self._viewModel.deleteClient()
+      self.deleteButton.setText("Deleted!")
+      QTimer.singleShot(1500, lambda: self.deleteButton.setText("Delete"))
+      return
+    
+    self.deleteButton.setEnabled(True)
+    self.deleteButton.setText("Cancelled!")
+    QTimer.singleShot(1500, lambda: self.deleteButton.setText("Delete"))
 
   # update on save
   def updateOnSave(self, clientName, clientList):

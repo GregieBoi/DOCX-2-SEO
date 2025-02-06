@@ -144,6 +144,8 @@ class TopicsModel(QObject):
 
     # save the topic dict after adding the new one
     with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'w') as f:
+      if self.selectedTopic not in ["New Topic"]:
+        del self.topicsJson[self.selectedTopic]
       self.topicsJson[self.topicName] = topic
       json.dump(self.topicsJson, f, indent=2)
       f.close()

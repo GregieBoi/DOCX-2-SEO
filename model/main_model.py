@@ -42,5 +42,4 @@ class MainModel(QObject):
     return self.clientList
   
   def updateTopicList(self):
-    print("---------------updateTopicList---------------")
     self.topicListChanged.emit(self.clientList)
