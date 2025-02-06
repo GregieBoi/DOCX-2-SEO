@@ -17,6 +17,8 @@ class GenerateView(QWidget):
     self._viewModel.clientLoaded.connect(self.updateOnClientLoad)
     self._viewModel.topicLoaded.connect(self.updateOnTopicLoad)
     self._viewModel.htmlGenerated.connect(self.updateOnHTMLGenerate)
+    self._viewModel.topicListChanged.connect(self.updateOnClientOrTopicListChange)
+    self._viewModel.clientListChanged.connect(self.updateOnClientOrTopicListChange)
     self.initUI()
     self._viewModel.initData.connect(self.updateOnInit)
     self._viewModel.startData()
@@ -82,6 +84,7 @@ class GenerateView(QWidget):
     self.automaticButtonOverride = LabeledLineEdit('Button Override', "View Inventory")
     self.automaticLinkOverride = LabeledLineEdit('Link Override', "https://www.client.com")
     self.automaticGenerateButton = QPushButton('Generate')
+    self.automaticGenerateButton.clicked.connect(lambda: self.generateClick(True))
     self.automaticGenerateButton.setEnabled(False)
 
     # add the widgets to the automatic tab layout
@@ -137,7 +140,18 @@ class GenerateView(QWidget):
       QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
       QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
       return
-
+    
+    downloadPath, _ = QFileDialog.getSaveFileName(self, 'Download File', self.lastDownloadDir, '*.html')
+    if not downloadPath:
+      self.manualGenerateButton.setEnabled(True)
+      self.automaticGenerateButton.setEnabled(True)
+      self.manualGenerateButton.setText("Failed!")
+      self.automaticGenerateButton.setText("Failed!")
+      QTimer.singleShot(1500, lambda: self.manualGenerateButton.setText("Generate"))
+      QTimer.singleShot(1500, lambda: self.automaticGenerateButton.setText("Generate"))
+      return
+    self.lastDownloadDir = os.path.dirname(downloadPath)
+    self._viewModel.generateHTML(autoSelect, [], "topic", self.automaticButtonOverride.getText(), self.automaticLinkOverride.getText(), downloadPath, downloadPath)
     self.manualGenerateButton.setEnabled(True)
     self.automaticGenerateButton.setEnabled(True)
     self.manualGenerateButton.setText("Generated!")
@@ -202,3 +216,12 @@ class GenerateView(QWidget):
     self.automaticTopicCombo.clear()
     self.automaticTopicCombo.blockSignals(False)
     self.automaticTopicCombo.addItems(topicList)
+
+  def updateOnClientOrTopicListChange(self, list: list[str]):
+    currentClient = self.clientCombo.getCurrentText()
+    clientList = self._viewModel.getClientList()
+    self.clientCombo.blockSignals(True)
+    self.clientCombo.clear()
+    self.clientCombo.blockSignals(False)
+    self.clientCombo.addItems(clientList)
+    self.clientCombo.setCurrentText(currentClient)

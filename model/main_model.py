@@ -9,6 +9,7 @@ import os
 #    and updated efficiently
 class MainModel(QObject):
   clientListChanged = pyqtSignal(list)
+  topicListChanged = pyqtSignal(list)
 
   def __init__(self):
     super().__init__()
@@ -39,3 +40,7 @@ class MainModel(QObject):
     self.clientList = self.fetchClientList()
     self.clientListChanged.emit(self.clientList)
     return self.clientList
+  
+  def updateTopicList(self):
+    print("---------------updateTopicList---------------")
+    self.topicListChanged.emit(self.clientList)

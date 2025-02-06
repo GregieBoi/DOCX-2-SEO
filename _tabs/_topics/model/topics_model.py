@@ -150,6 +150,7 @@ class TopicsModel(QObject):
 
     self.selectedTopic = self.topicName
     self.refreshTopicList()
+    self._mainModel.updateTopicList()
 
   # load the selected topic
   def loadTopic(self, topicName: str):
@@ -178,6 +179,7 @@ class TopicsModel(QObject):
 
     self.clearTopic()
     self.refreshTopicList()
+    self._mainModel.updateTopicList()
     
   # fetch the list of topics from the clients topic.json
   def fetchTopicList(self):

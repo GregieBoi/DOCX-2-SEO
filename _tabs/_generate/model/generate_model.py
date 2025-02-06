@@ -33,7 +33,8 @@ class GenerateModel(QObject):
     super().__init__()
     self._mainModel: MainModel = mainModel
     self._mainModel.clientListChanged.connect(self.refreshClientList)
-    self.topicListChanged.connect(self.refreshTopicList)
+    self._mainModel.topicListChanged.connect(self.refreshClientList)
+    #self.topicListChanged.connect(self.refreshTopicList)
     self.clientDirectory: str = self._mainModel.findClientDirectory()
     self.clientList: list[str] = self._mainModel.getClientList()
     self.currentClient: str = self.clientList[0]
@@ -257,9 +258,6 @@ class GenerateModel(QObject):
       
       newSOUP.append(wrap)
 
-    print("\n\n\n---------------New SOUP---------------\n\n\n")
-    print(newSOUP)
-
     return newSOUP
 
   def fixTableSOUP(self, html: BeautifulSoup):
@@ -305,6 +303,10 @@ class GenerateModel(QObject):
           tag[k] = v
 
   def populateImgSrcs(self, html: BeautifulSoup, autoSelect: bool, imageSrcs: list[str], altText: str):
+    heros = self.topicHeroSrcs[:]
+    techs = self.topicTechSrcs[:]
+    interiors = self.topicInteriorSrcs[:]
+    miscs = self.topicMiscSrcs[:]
     for i, (img, h1) in enumerate(zip(html.find_all('img'), html.find_all('h1'))):
       if autoSelect:
         img['src'] = self.selectImage(h1.text.lower(), i == 0)
@@ -313,60 +315,90 @@ class GenerateModel(QObject):
       img['src'] = imageSrcs[0]
       img['alt'] = altText
       imageSrcs.pop(0)
+    self.setTopicHeroSrcs(heros[:])
+    self.setTopicTechSrcs(techs[:])
+    self.setTopicInteriorSrcs(interiors[:])
+    self.setTopicMiscSrcs(miscs[:])
 
   def selectImage(self, h1Text: str, first: bool):
     if first:
       pick = random.choice(self.topicHeroSrcs)
-      self.topicHeroSrcs.pop(pick)
+      self.topicHeroSrcs.remove(pick)
       return pick
     keywordCounts = Counter(
       keyword for keyword in KEYWORDS if keyword in h1Text.lower()
     )
+    print(keywordCounts)
+    if not keywordCounts:
+      print("no keywords found")
+      if len(self.topicMiscSrcs) > 0:
+        pick = random.choice(self.topicMiscSrcs)
+        self.topicMiscSrcs.remove(pick)
+        return pick
+      elif len(self.topicInteriorSrcs) > 0:
+        pick = random.choice(self.topicInteriorSrcs)
+        self.topicInteriorSrcs.remove(pick)
+        return pick
+      elif len(self.topicTechSrcs) > 0:
+        pick = random.choice(self.topicTechSrcs)
+        self.topicTechSrcs.remove(pick)
+        return pick
+      elif len(self.topicHeroSrcs) > 0:
+        pick = random.choice(self.topicHeroSrcs)
+        self.topicHeroSrcs.remove(pick)
+        return pick
+      else:
+        return ''
 
-    category = keywordCounts.most_common(1)[0][0]
+    keyword = keywordCounts.most_common(1)[0][0]
+    category = KEYWORDS[keyword]
     if category == 'hero' and len(self.topicHeroSrcs) > 0:
+      print("picking hero")
       pick = random.choice(self.topicHeroSrcs)
-      self.topicHeroSrcs.pop(pick)
+      self.topicHeroSrcs.remove(pick)
       return pick
     elif category == 'tech' and len(self.topicTechSrcs) > 0:
+      print("picking tech")
       pick = random.choice(self.topicTechSrcs)
-      self.topicTechSrcs.pop(pick)
+      self.topicTechSrcs.remove(pick)
       return pick
     elif category == 'interior' and len(self.topicInteriorSrcs) > 0:
+      print("picking interior")
       pick = random.choice(self.topicInteriorSrcs)
-      self.topicInteriorSrcs.pop(pick)
-      return pick
-    elif category == 'misc' and len(self.topicMiscSrcs) > 0:
-      pick = random.choice(self.topicMiscSrcs)
-      self.topicMiscSrcs.pop(pick)
+      self.topicInteriorSrcs.remove(pick)
       return pick
     elif len(self.topicMiscSrcs) > 0:
+      print("picking misc")
       pick = random.choice(self.topicMiscSrcs)
-      self.topicMiscSrcs.pop(pick)
+      self.topicMiscSrcs.remove(pick)
       return pick
     elif len(self.topicInteriorSrcs) > 0:
+      print("picking interior as secondary")
       pick = random.choice(self.topicInteriorSrcs)
-      self.topicInteriorSrcs.pop(pick)
+      self.topicInteriorSrcs.remove(pick)
       return pick
     elif len(self.topicTechSrcs) > 0:
+      print("picking tech as secondary")
       pick = random.choice(self.topicTechSrcs)
-      self.topicTechSrcs.pop(pick)
+      self.topicTechSrcs.remove(pick)
       return pick
     elif len(self.topicHeroSrcs) > 0:
+      print("picking hero as secondary")
       pick = random.choice(self.topicHeroSrcs)
-      self.topicHeroSrcs.pop(pick)
+      self.topicHeroSrcs.remove(pick)
       return pick
     else:
       return ''
     
   def populateBtns(self, html: BeautifulSoup, autoSelect: bool):
     for btn in html.find_all('a'):
-      if btn.string.startswith('https://'):
+      text = btn.string
+      if text and (btn.string.startswith('https://') or btn.string.startswith('http://') or btn.string.startswith('www.')):
         continue
 
       if autoSelect:
         btn['href'] = self.topicLink if self.linkOverride == '' else self.linkOverride
-        btn.string = self.selectedTopic if self.buttonTextOverride == '' else self.buttonTextOverride
+        btn.string = "View Inventory"if self.buttonTextOverride == '' else self.buttonTextOverride
         continue
       btn['href'] = self.linkOverride
       btn.string = 'View Inventory' if self.buttonTextOverride == '' else self.buttonTextOverride
@@ -374,7 +406,7 @@ class GenerateModel(QObject):
     for btn in html.find_all('button'):
       if autoSelect:
         btn['onclick'] = "window.location.href='" + self.topicLink + "'" if self.linkOverride == '' else "window.location.href='" + self.linkOverride + "'"
-        btn.string = self.selectedTopic if self.buttonTextOverride == '' else self.buttonTextOverride
+        btn.string = "View Inventory" if self.buttonTextOverride == '' else self.buttonTextOverride
         continue
       btn['onclick'] = "window.location.href='" + self.linkOverride + "'"
       btn.string = 'View Inventory' if self.buttonTextOverride == '' else self.buttonTextOverride
@@ -386,6 +418,7 @@ class GenerateModel(QObject):
 
   # fetch the topics.json file as a dictionary
   def fetchTopicsJSON(self):
+    print("---------------fetchTopicsJSON---------------")
     with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'r') as f:
       self.topicsJson = json.load(f)
       f.close()
@@ -398,6 +431,7 @@ class GenerateModel(QObject):
     return sorted(topics)
   
   def loadClient(self, clientName: str):
+    print("---------------loadClient---------------")
     self.clear()
 
     self.currentClient = clientName
@@ -407,8 +441,11 @@ class GenerateModel(QObject):
   def refreshClientList(self, clientList: list):
     self.clientList = clientList
     self.clientListChanged.emit(self.clientList)
+    self.topicListChanged.emit(self.topicList)
 
   def refreshTopicList(self, topicList: list):
+    print("---------------refreshTopicList---------------")
+    print(topicList)
     self.topicsJson = self.fetchTopicsJSON()
     self.topicList = self.fetchTopicList()
     self.topicListChanged.emit(self.topicList)
