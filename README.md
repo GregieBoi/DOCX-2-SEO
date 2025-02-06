@@ -1,7 +1,8 @@
 # DOCX-2-SEO
+SEO is extremely important for any website. One way to improve SEO is to add regularly updated content to your site like blog posts. However, this can be a tedious and time consuming process. When given just the text in the form of DOCX files from content writers or clients then having to manually type in the content and then upload it to a website builder, it can be a lot of work. DOCX-2-SEO is built to help streamline this process by converting a blog post written in a DOCX file into a properly styled HTML document with added buttons and images to be published as blogs on client websites. 
 
-## What is this?
-DOCX-2-SEO is a desktop application built using Python and PyQT6 utilizing the BeautifulSoup4 and Mammoth Python libraries to convert formatted Microsoft Word documents (.docx) into properly styled HTML documents (.html) with added buttons and images to be published as blogs on client websites.
+## Tech Used
+DOCX-2-SEO is a desktop application built using Python and PyQT6 utilizing the BeautifulSoup4 and Mammoth Python libraries to convert formatted Microsoft Word documents (.docx) into properly styled HTML documents (.html) with added buttons and images to be published as blogs on client websites. UI currently is formatted specifically for macOS: the application should work on Windows and Linux, but the UI may not be as polished or have inconsistent styling.
 
 ## Creating a Client
 Clients hold styling, formatting, and other information to be used for generating the HTML document. You can create a client in the client tab by following these steps:
@@ -22,6 +23,13 @@ Clients hold styling, formatting, and other information to be used for generatin
     }
 }
 ```
+Some client website builders may have the ability to add style tags. For these clients, you add the style tag like any other tag in the styling JSON with the value being a string of anything that should be contained in the style tag. The value must only be on a single like of text as well to stay in format with the JSON. For example, if you wanted to add a style tag with the class "my-style" and the value "color: red", you would enter the following code:
+```
+{
+    "style": ".my-style { color: red; }"
+}
+```
+
 5. Enter the content section wrapper html code for the document. By default, this is set to <div><div></div></div>. If further styling is needed, you can edit the properties of each div tag as you see fit. The wrapper code must contain two div tags with one nested inside the other.
 
 6. Click "Save" to save the client.
@@ -62,4 +70,4 @@ Editing a topic is the same as creating a topic, except you can edit the existin
 Deleting a client is simple and straightforward. Select the client you would like to delete from the dropdown menu and click "Delete" to remove it from the list.
 
 ## Deleting a Topic
-Deleting a topic is simple and straightforward. Select the topic you would like to delete from the dropdown menu and click "Delete" to remove it from the list.
+Deleting a topic is simple and straightforward. Select the client you would like to delete the topic from and then select the topic itself from the dropdown menu and click "Delete" to remove it from the list.

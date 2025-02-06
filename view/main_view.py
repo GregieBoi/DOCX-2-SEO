@@ -38,6 +38,7 @@ class MainView(QWidget):
     self.topicsModelView = TopicsViewModel(self.topicsModel)
     self.topicsTab = TopicsView(self.topicsModelView)
     self.tabs.addTab(self.topicsTab, 'Topics')
+    self.tabs.setCurrentIndex(1)
     self.setLayout(self.layout)  # Set the layout of the widget
 
   def updateLabel(self, count):
