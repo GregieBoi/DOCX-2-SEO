@@ -15,6 +15,8 @@ class LabeledTextEdit(QWidget):
       metrics = self.textEdit.fontMetrics()
       line_height = metrics.lineSpacing()
       self.textEdit.setFixedHeight(lines * line_height + 10)
+      tab_width = 2 * metrics.horizontalAdvance(' ')
+      self.textEdit.setTabStopDistance(tab_width)
     layout = QVBoxLayout()
     layout.addWidget(self.label)
     layout.addWidget(self.textEdit)
