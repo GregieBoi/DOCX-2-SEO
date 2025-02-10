@@ -417,7 +417,7 @@ class GenerateModel(QObject):
   # fetch the list of topics from the clients topic.json
   def fetchTopicList(self):
     topics = []
-    if topics:
+    if self.topicsJson:
       for topic in self.topicsJson.keys(): topics.append(topic) 
     return sorted(topics)
   

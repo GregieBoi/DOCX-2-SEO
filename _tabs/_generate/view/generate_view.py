@@ -207,6 +207,7 @@ class GenerateView(QWidget):
     self.automaticTopicCombo.blockSignals(True)
     self.automaticTopicCombo.clear()
     self.automaticTopicCombo.blockSignals(False)
+    print(topicList)
     self.automaticTopicCombo.addItems(topicList)
 
   def updateOnTopicLoad(self, topicLink: str):
