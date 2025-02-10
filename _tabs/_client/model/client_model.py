@@ -74,7 +74,13 @@ class ClientModel(QObject):
   # find the main window directory
   def findMWD(self):
     if getattr(sys, 'frozen', False):
-      return os.path.join(os.path.dirname(sys.executable), 'CLIENTS')
+      try: 
+        path = os.path.dirname(sys.executable)
+        path = path.replace('MacOS', 'Resources')
+        path = os.path.join(path, 'CLIENTS')
+        return path
+      except:
+        return os.path.join(os.path.dirname(sys.executable), 'Resources', 'CLIENTS')
     return os.path.join(os.path.dirname(__main__.__file__), 'CLIENTS')
 
   # save the client attributes to a new directory

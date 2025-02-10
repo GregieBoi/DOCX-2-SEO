@@ -23,7 +23,13 @@ class MainModel(QObject):
   # find the client directory
   def findClientDirectory(self):
     if getattr(sys, 'frozen', False):
-      return os.path.join(os.path.dirname(sys.executable), 'CLIENTS')
+      try: 
+        path = os.path.dirname(sys.executable)
+        path = path.replace('MacOS', 'Resources')
+        path = os.path.join(path, 'CLIENTS')
+        return path
+      except:
+        return os.path.join(os.path.dirname(sys.executable), 'Resources', 'CLIENTS')
     return os.path.join(os.path.dirname(__main__.__file__), 'CLIENTS')
 
   # fetch all clients from the client directory

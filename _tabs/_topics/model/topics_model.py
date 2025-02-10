@@ -37,7 +37,7 @@ class TopicsModel(QObject):
     self._mainModel.clientListChanged.connect(self.refreshClientList)
     self.clientDirectory: str = self._mainModel.findClientDirectory()
     self.clientList: list[str] = self._mainModel.getClientList()
-    self.currentClient: str = self.clientList[0]
+    self.currentClient: str = self.clientList[0] if self.clientList else ''
     self.topicsJson: dict[str, TOPICSTYPEHINT] = self.fetchTopicsJSON()
     self.topicList: list[str] = self.fetchTopicList()
     self.selectedTopic: str = "New Topic"
@@ -111,7 +111,7 @@ class TopicsModel(QObject):
   # clear topic and client attributes
   def clear(self):
     self.clearTopic()
-    self.currentClient = self.clientList[0]
+    self.currentClient = self.clientList[0] if self.clientList else ''
 
   # reset the topic attributes
   def clearTopic(self):
@@ -191,10 +191,12 @@ class TopicsModel(QObject):
 
   # fetch the topics.json file as a dictionary
   def fetchTopicsJSON(self):
-    with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'r') as f:
-      self.topicsJson = json.load(f)
-      f.close()
-    return self.topicsJson
+    if self.currentClient not in [None, '']:
+      with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'r') as f:
+        self.topicsJson = json.load(f)
+        f.close()
+      return self.topicsJson
+    return {}
   
   # load the selected client
   def loadClient(self, clientName: str):

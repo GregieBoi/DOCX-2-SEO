@@ -41,6 +41,7 @@ class GenerateView(QWidget):
     self.uploadLayout.addWidget(self.uploadButton)
     self.clientCombo = LabeledDropdown('Client')
     self.clientCombo.currentTextChanged.connect(self._viewModel.loadClient)
+    self.clientCombo.currentTextChanged.connect(self.canGenerate)
     self.uploadLayout.addWidget(self.clientCombo)
 
     # set the alignment of the upload layout and add it to the main layout
@@ -170,13 +171,32 @@ class GenerateView(QWidget):
       self.uploadButton.setToolTip(fileName)
       self.uploadButton.button.setText("Uploaded!")
       self.uploadButton.setEnabled(True)
-      self.manualGenerateButton.setEnabled(True)
-      self.automaticGenerateButton.setEnabled(True)
+      self.canGenerate()
       QTimer.singleShot(1500, lambda: self.uploadButton.button.setText("Upload"))
       return
     self.uploadButton.setEnabled(True)
     self.uploadButton.button.setText("Failed!")
     QTimer.singleShot(1500, lambda: self.uploadButton.button.setText("Upload"))
+
+  def canGenerate(self):
+    whyNot = ""
+    if self.clientCombo.getCurrentText() in [None, '']:
+      whyNot += "You must select a client \n"
+    
+    if self.uploadButton.toolTip() == "Upload a DOCX file to generate an HTML file":
+      whyNot += "You must upload a DOCX file \n"
+
+    if whyNot != "":
+      self.manualGenerateButton.setEnabled(False)
+      self.automaticGenerateButton.setEnabled(False)
+      self.manualGenerateButton.setToolTip(whyNot[:-2])
+      self.automaticGenerateButton.setToolTip(whyNot[:-2])
+      return
+
+    self.manualGenerateButton.setEnabled(True)
+    self.automaticGenerateButton.setEnabled(True)
+    self.manualGenerateButton.setToolTip("")
+    self.automaticGenerateButton.setToolTip("")
 
   def updateOnClientLoad(self, currentClient: str, topicList: list[str]):
     self.clientCombo.setCurrentText(currentClient)

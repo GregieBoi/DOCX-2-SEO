@@ -36,12 +36,12 @@ class GenerateModel(QObject):
     self._mainModel.topicListChanged.connect(self.refreshClientList)
     self.clientDirectory: str = self._mainModel.findClientDirectory()
     self.clientList: list[str] = self._mainModel.getClientList()
-    self.currentClient: str = self.clientList[0]
+    self.currentClient: str = '' if self.clientList == [] else self.clientList[0]
     self.buttonTextOverride: str = ""
     self.linkOverride: str = ""
     self.topicsJson: dict[str, TOPICSTYPEHINT] = self.fetchTopicsJSON()
     self.topicList: list[str] = self.fetchTopicList()
-    self.selectedTopic: str = self.topicList[0]
+    self.selectedTopic: str = self.topicList[0] if self.topicList else ''
     self.topicLink: str = ""
     self.topicHeroSrcs: list[str] = []
     self.topicTechSrcs: list[str] = []
@@ -139,11 +139,12 @@ class GenerateModel(QObject):
     return self.lastDownloadDir
   
   def startTopicSrcs(self):
-    self.topicLink = self.topicsJson[self.selectedTopic]['link']
-    self.topicHeroSrcs = self.topicsJson[self.selectedTopic]['images']['hero']
-    self.topicTechSrcs = self.topicsJson[self.selectedTopic]['images']['tech']
-    self.topicInteriorSrcs = self.topicsJson[self.selectedTopic]['images']['interior']
-    self.topicMiscSrcs = self.topicsJson[self.selectedTopic]['images']['misc']
+    if self.selectedTopic not in [None, '']:
+      self.topicLink = self.topicsJson[self.selectedTopic]['link']
+      self.topicHeroSrcs = self.topicsJson[self.selectedTopic]['images']['hero']
+      self.topicTechSrcs = self.topicsJson[self.selectedTopic]['images']['tech']
+      self.topicInteriorSrcs = self.topicsJson[self.selectedTopic]['images']['interior']
+      self.topicMiscSrcs = self.topicsJson[self.selectedTopic]['images']['misc']
   
   # clear the generate attributes
   def clear(self):
@@ -405,15 +406,19 @@ class GenerateModel(QObject):
 
   # fetch the topics.json file as a dictionary
   def fetchTopicsJSON(self):
-    with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'r') as f:
-      self.topicsJson = json.load(f)
-      f.close()
-    return self.topicsJson
+    try:
+      with open(os.path.join(self.clientDirectory, self.currentClient, 'topics.json'), 'r') as f:
+        self.topicsJson = json.load(f)
+        f.close()
+      return self.topicsJson
+    except:
+      self.topicsJson = {}
   
   # fetch the list of topics from the clients topic.json
   def fetchTopicList(self):
     topics = []
-    for topic in self.topicsJson.keys(): topics.append(topic) 
+    if topics:
+      for topic in self.topicsJson.keys(): topics.append(topic) 
     return sorted(topics)
   
   def loadClient(self, clientName: str):

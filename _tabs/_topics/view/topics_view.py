@@ -30,6 +30,7 @@ class TopicsView(QWidget):
     self.clientCombo = LabeledDropdown('Client')
     self.clientCombo.currentTextChanged.connect(self._viewModel.loadClient)
     self.clientCombo.currentTextChanged.connect(self.canDelete)
+    self.clientCombo.currentTextChanged.connect(self.canSave)
     self.topicCombo = LabeledDropdown('Topic')
     self.topicCombo.currentTextChanged.connect(self._viewModel.loadTopic)
     self.topicCombo.currentTextChanged.connect(self.canDelete)
@@ -93,9 +94,13 @@ class TopicsView(QWidget):
     self.setLayout(self.layout)  # Set the layout to the widget
 
   def canSave(self):
+    client = self.clientCombo.getCurrentText()
     name = self.topicNameLineEdit.getText()
     link = self.topicLinkLineEdit.getText()
     whyNot = ""
+    if client in [None, '']:
+      whyNot += "You must select a client \n"
+
     if name.isspace() or name == "":
       whyNot += "You must enter a name for the topic \n"
     elif name == "New Topic":
@@ -115,7 +120,7 @@ class TopicsView(QWidget):
     self.saveButton.setToolTip("")
 
   def canDelete(self):
-    if self.topicCombo.getCurrentText() == "New Topic":
+    if self.topicCombo.getCurrentText() in ["New Topic", "", None]:
       self.deleteButton.setEnabled(False)
       self.deleteButton.setToolTip("You can only delete saved topics")
       return
@@ -181,7 +186,7 @@ class TopicsView(QWidget):
   def updateOnDelete(self, topicList):
     self.topicCombo.clear()
     self.topicCombo.addItems(topicList)
-    self.topicCombo.setCurrentText("New Topic")
+    self.topicCombo.setCurrentText("New Topic" if self.clientCombo.getCurrentText() not in ["", None] else "")
 
   def updateOnTopicLoad(self, currentClient, selectedTopic, topicName, topicLink, topicHeroSrcs, topicTechSrcs, topicInteriorSrcs, topicMiscSrcs):
     self.heroSection.clear()
@@ -201,7 +206,8 @@ class TopicsView(QWidget):
   def updateOnClientLoad(self, currentClient, topicList):
     self.clientCombo.setCurrentText(currentClient)
     self.topicCombo.clear()
-    self.topicCombo.addItems(topicList)
+    if currentClient not in [None, ""]:
+      self.topicCombo.addItems(topicList)
     self.topicCombo.setCurrentText("New Topic")
 
   def updateOnInit(self, clientList, topicList):
@@ -216,6 +222,6 @@ class TopicsView(QWidget):
     if self._viewModel.getCurrentClient() in clientList:
       self.clientCombo.setCurrentText(self._viewModel.getCurrentClient())
     else:
-      self.clientCombo.setCurrentText(clientList[0])
+      self.clientCombo.setCurrentText(clientList[0] if clientList else '')
       self._viewModel.loadClient(self.clientCombo.getCurrentText())
     self.clientCombo.blockSignals(False)

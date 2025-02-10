@@ -3,3 +3,15 @@
 
 # ignore client subdirectories
 /CLIENTS/*
+
+/build
+
+/dist
+
+*.spec
+
+*.ico
+
+*.icns
+
+*.sh
