@@ -20,6 +20,7 @@ from typing import TypedDict
 # selected topic
 # 7. Load the topics list from the selected client
 
+# Keywords are used to determine the category of an image
 KEYWORDS = {"connectivity": "tech", "connect": "tech", "connected": "tech", "technology": "tech", "tech": "tech", "interior": "interior", "cabin": "interior", "seats": "interior", "exterior": "hero", "body": "hero", "power": "hero", "engine": "hero", "luxury": "interior"}
 
 IMAGESTYPEHINT = TypedDict('Images', {'hero': list[str], 'tech': list[str], 'interior': list[str], 'misc': list[str]})
