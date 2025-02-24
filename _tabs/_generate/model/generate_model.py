@@ -225,6 +225,7 @@ class GenerateModel(QObject):
       if i == 0:
         continue
       btn = BeautifulSoup(button, 'html.parser')
+      print(btn)
       img.insert_before(btn)
 
     btn = BeautifulSoup(button, 'html.parser')
@@ -386,14 +387,19 @@ class GenerateModel(QObject):
       if text and (btn.string.startswith('https://') or btn.string.startswith('http://') or btn.string.startswith('www.')):
         continue
 
+      has_button = True if html.find_all('button') != [] else False
+
       if autoSelect:
         btn['href'] = self.topicLink if self.linkOverride == '' else self.linkOverride
-        btn.string = "View Inventory"if self.buttonTextOverride == '' else self.buttonTextOverride
+        if not has_button:
+          btn.string = "View Inventory"if self.buttonTextOverride == '' else self.buttonTextOverride
         continue
       btn['href'] = self.linkOverride
-      btn.string = 'View Inventory' if self.buttonTextOverride == '' else self.buttonTextOverride
+      if not has_button:
+        btn.string = 'View Inventory' if self.buttonTextOverride == '' else self.buttonTextOverride
 
     for btn in html.find_all('button'):
+      print("found button")
       if autoSelect:
         btn['onclick'] = "window.location.href='" + self.topicLink + "'" if self.linkOverride == '' else "window.location.href='" + self.linkOverride + "'"
         btn.string = "View Inventory" if self.buttonTextOverride == '' else self.buttonTextOverride
