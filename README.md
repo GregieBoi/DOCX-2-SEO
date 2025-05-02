@@ -4,6 +4,20 @@ SEO is extremely important for any website. One way to improve SEO is to add reg
 ## Tech Used
 DOCX-2-SEO is a desktop application built using Python and PyQT6 utilizing the BeautifulSoup4 and Mammoth Python libraries to convert formatted Microsoft Word documents (.docx) into properly styled HTML documents (.html) with added buttons and images to be published as blogs on client websites. UI currently is formatted specifically for macOS: the application should work on Windows and Linux, but the UI may not be as polished or have inconsistent styling.
 
+## Setup for Development on Your Machine
+There are a few things that need to be done to make sure you can get the development up and running on your end for DOCX-2-SEO. You can set this up with or without a python venv, but like all python project a venv is recommended:
+
+1. Clone the repo to your machine
+   
+2. Make sure you are using Python version 3.9
+
+3. Install all requirement using the command
+   ```
+   pip install -r requirements.txt
+   ```
+   
+4. Start making contributions. The application can be started by running the main.py file in the terminal
+
 ## Creating a Client
 Clients hold styling, formatting, and other information to be used for generating the HTML document. You can create a client in the client tab by following these steps:
 
