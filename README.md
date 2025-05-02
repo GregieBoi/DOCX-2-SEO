@@ -11,9 +11,9 @@ Clients hold styling, formatting, and other information to be used for generatin
 
 2. Enter the name of the client into the "Name" field.
 
-3. Enter the html code for the button you would like to appear in the document. The button code can be of any format so long it contains an <a> tag.
+3. Enter the html code for the button you would like to appear in the document. The button code can be of any format so long it contains an anchor tag.
 
-4. Enter any styling information on a per tag basis using the JSON format. For example, if you only wanted to style all <p> tags such that they were 14px in size, bold, and red, you would enter the following code:
+4. Enter any styling information on a per tag basis using the JSON format. For example, if you only wanted to style all paragraph tags such that they were 14px in size, bold, and red, you would enter the following code:
 ```
 {
     "p": {
@@ -30,7 +30,7 @@ Some client website builders may have the ability to add style tags. For these c
 }
 ```
 
-5. Enter the content section wrapper html code for the document. By default, this is set to <div><div></div></div>. If further styling is needed, you can edit the properties of each div tag as you see fit. The wrapper code must contain two div tags with one nested inside the other.
+5. Enter the content section wrapper html code for the document. By default, this is set to a div tag with another nested div inside it. If further styling is needed, you can edit the properties of each div tag as you see fit. The wrapper code must contain two div tags with one nested inside the other.
 
 6. Click "Save" to save the client.
 
